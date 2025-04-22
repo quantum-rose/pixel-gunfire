@@ -4,6 +4,7 @@ import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { PrefabPathEnum, TexturePathEnum } from '../Enum';
 import DataManager from '../Global/DataManager';
+import { ObjectPoolManager } from '../Global/ObjectPoolManager';
 import { ResourceManager } from '../Global/ResourceManager';
 import { JoyStickManager } from '../UI/JoyStickManager';
 const { ccclass, property } = _decorator;
@@ -108,10 +109,8 @@ export class BattleManager extends Component {
         for (const bullet of DataManager.Instance.state.bullets) {
             let bm = DataManager.Instance.bulletMap.get(bullet.id);
             if (!bm) {
-                const prefab = DataManager.Instance.prefabMap.get(bullet.type);
-                const node = instantiate(prefab);
-                node.setParent(this._stage);
-                bm = node.addComponent(BulletManager);
+                const node = ObjectPoolManager.Instance.get(bullet.type);
+                bm = node.getComponent(BulletManager) ?? node.addComponent(BulletManager);
                 DataManager.Instance.bulletMap.set(bullet.id, bm);
                 bm.init(bullet);
             }

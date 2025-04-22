@@ -1,0 +1,46 @@
+import { Node, instantiate } from 'cc';
+import Singleton from '../Base/Singleton';
+import { EntityTypeEnum } from '../Common';
+import DataManager from './DataManager';
+
+export class ObjectPoolManager extends Singleton {
+    static get Instance() {
+        return super.GetInstance<ObjectPoolManager>();
+    }
+
+    private _objectPool: Node;
+
+    private _pool = new Map<EntityTypeEnum, Node[]>();
+
+    public get(type: EntityTypeEnum): Node {
+        if (!this._objectPool) {
+            this._objectPool = new Node('ObjectPool');
+            this._objectPool.setParent(DataManager.Instance.stage);
+        }
+
+        if (!this._pool.has(type)) {
+            this._pool.set(type, []);
+            const container = new Node(type + 'Pool');
+            container.setParent(this._objectPool);
+        }
+
+        const pool = this._pool.get(type);
+        if (pool.length === 0) {
+            const prefab = DataManager.Instance.prefabMap.get(type);
+            const node = instantiate(prefab);
+            node.name = type;
+            node.setParent(this._objectPool.getChildByName(type + 'Pool'));
+            node.active = true;
+            return node;
+        }
+
+        const node = pool.pop();
+        node.active = true;
+        return node;
+    }
+
+    public ret(node: Node) {
+        node.active = false;
+        this._pool.get(node.name as EntityTypeEnum).push(node);
+    }
+}

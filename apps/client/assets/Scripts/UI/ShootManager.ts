@@ -13,6 +13,7 @@ export class ShootManager extends Component {
 
     protected onLoad(): void {
         this._body = this.node.getChildByName('Body');
+        this._body.active = false;
         this._defaultPos = new Vec2(this._body.position.x, this._body.position.y);
 
         input.on(Input.EventType.TOUCH_START, this._onTouchStart, this);

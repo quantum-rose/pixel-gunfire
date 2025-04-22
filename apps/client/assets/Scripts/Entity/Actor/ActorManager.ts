@@ -1,4 +1,4 @@
-import { _decorator, instantiate } from 'cc';
+import { _decorator, Color, instantiate, Node, ProgressBar, Sprite } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
 import { IActor, InputTypeEnum } from '../../Common';
 import { EntityStateEnum } from '../../Enum';
@@ -14,8 +14,16 @@ export class ActorManager extends EntityManager {
 
     private _wm: WeaponManager;
 
+    private _hp: Node;
+
     public init(data: IActor) {
         this.id = data.id;
+        this._hp = this.node.getChildByName('HP');
+        if (this.id === DataManager.Instance.myPlayerId) {
+            this._hp.getComponentInChildren(Sprite).color = new Color(0, 220, 0, 255);
+        } else {
+            this._hp.getComponentInChildren(Sprite).color = new Color(255, 0, 0, 255);
+        }
 
         this.fsm = this.addComponent(ActorStateMachine);
         this.fsm.init(data.type);
@@ -39,9 +47,16 @@ export class ActorManager extends EntityManager {
 
         const rotation = radianToAngle(Math.atan2(direction.y, flipX ? -direction.x : direction.x));
         this._wm.node.setRotationFromEuler(0, 0, rotation);
+
+        this._hp.setScale(flipX ? -1 : 1, 1);
+        this._hp.getComponent(ProgressBar).progress = data.hp / 100;
     }
 
     public tick(dt: number): void {
+        if (this.id !== DataManager.Instance.myPlayerId) {
+            return;
+        }
+
         if (DataManager.Instance.jm.input.length() > 0) {
             const { x, y } = DataManager.Instance.jm.input;
             DataManager.Instance.applyInput({

@@ -17,6 +17,7 @@ export class JoyStickManager extends Component {
 
     protected onLoad(): void {
         this._body = this.node.getChildByName('Body');
+        this._body.active = false;
         this._stick = this._body.getChildByName('Stick');
         this._defaultPos = new Vec2(this._body.position.x, this._body.position.y);
         this._radius = this._body.getComponent(UITransform).width / 2;
@@ -44,6 +45,7 @@ export class JoyStickManager extends Component {
 
         this._touchId = event.getID();
 
+        this._body.active = true;
         this._body.setPosition(touchPos.x, touchPos.y);
     }
 
@@ -70,8 +72,11 @@ export class JoyStickManager extends Component {
         }
         this._touchId = null;
 
+        this._body.active = false;
         this._body.setPosition(this._defaultPos.x, this._defaultPos.y);
+
         this._stick.setPosition(0, 0);
+
         this.input = new Vec2(0, 0);
     }
 }

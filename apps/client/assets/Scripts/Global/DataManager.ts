@@ -10,6 +10,10 @@ import EventManager from './EventManager';
 const ACTOR_SPEED = 100;
 const BULLET_SPEED = 600;
 
+const HIT_RADIUS = 35;
+
+const BULLET_DAMAGE = 5;
+
 export default class DataManager extends Singleton {
     static get Instance() {
         return super.GetInstance<DataManager>();
@@ -48,14 +52,26 @@ export default class DataManager extends Singleton {
                 type: EntityTypeEnum.Actor1,
                 weaponType: EntityTypeEnum.Weapon1,
                 bulletType: EntityTypeEnum.Bullet2,
-                id: 0,
-                position: { x: 0, y: 0 },
+                id: 1,
+                position: { x: -150, y: -150 },
                 direction: { x: 1, y: 0 },
+                hp: 80,
+            },
+            {
+                type: EntityTypeEnum.Actor1,
+                weaponType: EntityTypeEnum.Weapon1,
+                bulletType: EntityTypeEnum.Bullet2,
+                id: 2,
+                position: { x: 150, y: 150 },
+                direction: { x: -1, y: 0 },
+                hp: 80,
             },
         ],
         bullets: [],
         nextBulletId: 1,
     };
+
+    public myPlayerId = 1;
 
     public applyInput(input: IInput) {
         switch (input.type) {
@@ -121,6 +137,27 @@ export default class DataManager extends Singleton {
         const { dt } = input;
         for (let i = this.state.bullets.length - 1; i >= 0; i--) {
             const bullet = this.state.bullets[i];
+
+            let hit = false;
+            for (let j = this.state.actors.length - 1; j >= 0; j--) {
+                const actor = this.state.actors[j];
+                if (actor.id === bullet.owner) {
+                    continue;
+                }
+
+                if ((bullet.position.x - actor.position.x) ** 2 + (bullet.position.y - actor.position.y - 40) ** 2 < HIT_RADIUS ** 2) {
+                    actor.hp -= BULLET_DAMAGE;
+                    this.state.bullets.splice(i, 1);
+                    EventManager.Instance.emit(EventEnum.ExplosionBorn, bullet.id, bullet.position);
+                    hit = true;
+                    break;
+                }
+            }
+
+            if (hit) {
+                continue;
+            }
+
             if (
                 bullet.position.x < -this._stageWidth / 2 ||
                 bullet.position.x > this._stageWidth / 2 ||
@@ -131,6 +168,7 @@ export default class DataManager extends Singleton {
                 EventManager.Instance.emit(EventEnum.ExplosionBorn, bullet.id, bullet.position);
                 continue;
             }
+
             bullet.position.x += bullet.direction.x * dt * BULLET_SPEED;
             bullet.position.y += bullet.direction.y * dt * BULLET_SPEED;
         }

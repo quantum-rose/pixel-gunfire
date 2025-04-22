@@ -1,0 +1,11 @@
+{
+  "name": "game",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "yarn workspace @game/server run dev"
+  }
+}

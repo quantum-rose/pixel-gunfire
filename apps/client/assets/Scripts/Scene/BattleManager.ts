@@ -120,7 +120,7 @@ export class BattleManager extends Component {
     }
 
     private _renderStage() {
-        const actor = DataManager.Instance.state.actors[0];
-        this._stage.setPosition(-actor.position.x, -actor.position.y);
+        const myPlayer = DataManager.Instance.state.actors.find(actor => actor.id === DataManager.Instance.myPlayerId);
+        this._stage.setPosition(-myPlayer.position.x, -myPlayer.position.y);
     }
 }

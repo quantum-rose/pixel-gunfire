@@ -51,15 +51,15 @@ export default class DataManager extends Singleton {
             {
                 type: EntityTypeEnum.Actor1,
                 weaponType: EntityTypeEnum.Weapon1,
-                bulletType: EntityTypeEnum.Bullet2,
+                bulletType: EntityTypeEnum.Bullet1,
                 id: 1,
                 position: { x: -150, y: -150 },
                 direction: { x: 1, y: 0 },
                 hp: 80,
             },
             {
-                type: EntityTypeEnum.Actor1,
-                weaponType: EntityTypeEnum.Weapon1,
+                type: EntityTypeEnum.Actor2,
+                weaponType: EntityTypeEnum.Weapon2,
                 bulletType: EntityTypeEnum.Bullet2,
                 id: 2,
                 position: { x: 150, y: 150 },

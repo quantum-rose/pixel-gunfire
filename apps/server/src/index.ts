@@ -30,4 +30,14 @@ myServer.setApi(ApiMsgEnum.ApiPlayerJoin, (connection, data) => {
     return { player: { id, nickname, roomId } };
 });
 
+myServer.setApi(ApiMsgEnum.ApiPlayerList, (_connection, _data) => {
+    const allPlayers = PlayerManager.Instance.getAllPlayers();
+    const playerList = allPlayers.map(player => ({
+        id: player.id,
+        nickname: player.nickname,
+        roomId: player.roomId,
+    }));
+    return { list: playerList };
+});
+
 myServer.start();

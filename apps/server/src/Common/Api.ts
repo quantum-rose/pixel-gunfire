@@ -1,4 +1,4 @@
-interface IPlayer {
+export interface IPlayer {
     id: number;
     nickname: string;
     roomId: number;
@@ -10,4 +10,10 @@ export interface IApiPlayerJoinReq {
 
 export interface IApiPlayerJoinRes {
     player: IPlayer;
+}
+
+export interface IApiPlayerListReq {}
+
+export interface IApiPlayerListRes {
+    list: IPlayer[];
 }

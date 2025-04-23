@@ -52,4 +52,8 @@ export class PlayerManager extends Singleton {
     public getPlayerByConnection(connectionId: number) {
         return this._connection2Player.get(connectionId);
     }
+
+    public getAllPlayers() {
+        return Array.from(this._id2Player.values());
+    }
 }

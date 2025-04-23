@@ -16,6 +16,7 @@ export class LoginManager extends Component {
         this._errorMessage = this.node.getChildByName('ErrorMessage').getComponent(Label);
         this._errorMessage.string = '';
 
+        director.preloadScene(SceneEnum.Hall);
         director.preloadScene(SceneEnum.Battle);
 
         NetworkManager.Instance.connect();
@@ -40,7 +41,7 @@ export class LoginManager extends Component {
             DataManager.Instance.myPlayerId = res.player.id;
             DataManager.Instance.myNickname = res.player.nickname;
 
-            director.loadScene(SceneEnum.Battle);
+            director.loadScene(SceneEnum.Hall);
         } else {
             this._errorMessage.string = error;
         }

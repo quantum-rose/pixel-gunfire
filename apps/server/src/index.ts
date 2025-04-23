@@ -1,53 +1,33 @@
-import { WebSocket, WebSocketServer } from 'ws';
-import { ApiMsgEnum, IInput } from './Common';
+import { PlayerManager } from './Biz/PlayerManager';
+import { ApiMsgEnum } from './Common';
+import { MyServer } from './Core';
 import { symlinkCommon } from './Utils';
 
 symlinkCommon();
 
-const wss = new WebSocketServer({
+const myServer = new MyServer({
     port: 9876,
 });
 
-const inputs: IInput[] = [];
-const clients: WebSocket[] = [];
-
-wss.on('connection', socket => {
-    clients.push(socket);
-    console.log(`Client connected, total clients: ${clients.length}`);
-
-    socket.on('message', message => {
-        const json = JSON.parse(message.toString());
-        const {
-            name,
-            data: { frameId, input },
-        } = json;
-        inputs.push(input);
-    });
-
-    socket.on('close', () => {
-        const index = clients.indexOf(socket);
-        if (index !== -1) {
-            clients.splice(index, 1);
-        }
-        console.log(`Client disconnected, remaining clients: ${clients.length}`);
-    });
-});
-
-setInterval(() => {
-    if (inputs.length > 0) {
-        const sendMsg = JSON.stringify({
-            name: ApiMsgEnum.MsgServerSync,
-            data: {
-                inputs,
-            },
-        });
-        inputs.length = 0;
-        for (const client of clients) {
-            client.send(sendMsg);
-        }
+myServer.setApi(ApiMsgEnum.ApiPlayerJoin, (connection, data) => {
+    if (!data.nickname) {
+        throw new Error('昵称不能为空');
     }
-}, 0);
 
-wss.on('listening', () => {
-    console.log('WebSocket server is listening on ws://localhost:9876');
+    if (PlayerManager.Instance.getPlayerByConnection(connection.id)) {
+        throw new Error('重复登录');
+    }
+
+    if (PlayerManager.Instance.getPlayerByNickname(data.nickname)) {
+        throw new Error('昵称已存在');
+    }
+
+    if (PlayerManager.Instance.isFull) {
+        throw new Error('服务器已满');
+    }
+
+    const { id, nickname, roomId } = PlayerManager.Instance.createPlayer(data.nickname, connection);
+    return { player: { id, nickname, roomId } };
 });
+
+myServer.start();

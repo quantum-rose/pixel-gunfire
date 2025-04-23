@@ -1,4 +1,4 @@
-import { _decorator, Color, instantiate, Node, ProgressBar, Sprite } from 'cc';
+import { _decorator, Color, instantiate, Label, Node, ProgressBar, Sprite } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
 import { IActor, InputTypeEnum } from '../../Common';
 import { EntityStateEnum, EventEnum } from '../../Enum';
@@ -17,6 +17,8 @@ export class ActorManager extends EntityManager {
 
     private _hp: Node;
 
+    private _nickname: Node;
+
     public init(data: IActor) {
         this.id = data.id;
         this._hp = this.node.getChildByName('HP');
@@ -25,6 +27,8 @@ export class ActorManager extends EntityManager {
         } else {
             this._hp.getComponentInChildren(Sprite).color = new Color(255, 0, 0, 255);
         }
+        this._nickname = this.node.getChildByName('Nickname');
+        this._nickname.getComponent(Label).string = data.nickname;
 
         this.fsm = this.addComponent(ActorStateMachine);
         this.fsm.init(data.type);
@@ -51,6 +55,8 @@ export class ActorManager extends EntityManager {
 
         this._hp.setScale(flipX ? -1 : 1, 1);
         this._hp.getComponent(ProgressBar).progress = data.hp / 100;
+
+        this._nickname.setScale(flipX ? -1 : 1, 1);
     }
 
     public tick(dt: number): void {

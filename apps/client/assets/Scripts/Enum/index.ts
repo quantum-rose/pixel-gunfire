@@ -46,3 +46,8 @@ export enum EntityStateEnum {
     Run = 'Run',
     Attack = 'Attack',
 }
+
+export enum SceneEnum {
+    Login = 'Login',
+    Battle = 'Battle',
+}

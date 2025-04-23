@@ -1,5 +1,5 @@
 import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame } from 'cc';
-import { ApiMsgEnum, EntityTypeEnum, IInput, InputTypeEnum } from '../Common';
+import { ApiMsgEnum, EntityTypeEnum, IInput, IMsgServerSync, InputTypeEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum, PrefabPathEnum, TexturePathEnum } from '../Enum';
@@ -70,7 +70,7 @@ export class BattleManager extends Component {
         }
     }
 
-    private _onServerSync(data: any) {
+    private _onServerSync(data: IMsgServerSync) {
         for (const input of data.inputs) {
             DataManager.Instance.applyInput(input);
         }
@@ -151,6 +151,9 @@ export class BattleManager extends Component {
 
     private _renderStage() {
         const myPlayer = DataManager.Instance.state.actors.find(actor => actor.id === DataManager.Instance.myPlayerId);
+        if (!myPlayer) {
+            return;
+        }
         this._stage.setPosition(-myPlayer.position.x, -myPlayer.position.y);
     }
 }

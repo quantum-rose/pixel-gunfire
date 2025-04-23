@@ -13,6 +13,7 @@ export interface IActor {
     position: IVec2;
     direction: IVec2;
     hp: number;
+    nickname: string;
 }
 
 export interface IBullet {

@@ -56,6 +56,7 @@ export default class DataManager extends Singleton {
                 position: { x: -150, y: -150 },
                 direction: { x: 1, y: 0 },
                 hp: 80,
+                nickname: 'Player1',
             },
             {
                 type: EntityTypeEnum.Actor2,
@@ -65,13 +66,16 @@ export default class DataManager extends Singleton {
                 position: { x: 150, y: 150 },
                 direction: { x: -1, y: 0 },
                 hp: 80,
+                nickname: 'Player2',
             },
         ],
         bullets: [],
         nextBulletId: 1,
     };
 
-    public myPlayerId = 1;
+    public myPlayerId = null;
+
+    public myNickname = null;
 
     public frameId = 1;
 

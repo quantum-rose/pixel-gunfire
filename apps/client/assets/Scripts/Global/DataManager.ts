@@ -73,6 +73,8 @@ export default class DataManager extends Singleton {
 
     public myPlayerId = 1;
 
+    public frameId = 1;
+
     public applyInput(input: IInput) {
         switch (input.type) {
             case InputTypeEnum.ActorMove:

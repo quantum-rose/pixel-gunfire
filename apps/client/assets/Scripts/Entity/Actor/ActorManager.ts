@@ -1,8 +1,9 @@
 import { _decorator, Color, instantiate, Node, ProgressBar, Sprite } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
 import { IActor, InputTypeEnum } from '../../Common';
-import { EntityStateEnum } from '../../Enum';
+import { EntityStateEnum, EventEnum } from '../../Enum';
 import DataManager from '../../Global/DataManager';
+import EventManager from '../../Global/EventManager';
 import { radianToAngle } from '../../Utils';
 import { WeaponManager } from '../Weapon/WeaponManager';
 import { ActorStateMachine } from './ActorStateMachine';
@@ -30,11 +31,11 @@ export class ActorManager extends EntityManager {
 
         this.state = EntityStateEnum.Idle;
 
-        const weponPrefab = DataManager.Instance.prefabMap.get(data.weaponType);
-        const weponNode = instantiate(weponPrefab);
-        weponNode.setParent(this.node);
-        weponNode.setPosition(0, 38);
-        this._wm = weponNode.addComponent(WeaponManager);
+        const weaponPrefab = DataManager.Instance.prefabMap.get(data.weaponType);
+        const weaponNode = instantiate(weaponPrefab);
+        weaponNode.setParent(this.node);
+        weaponNode.setPosition(0, 38);
+        this._wm = weaponNode.addComponent(WeaponManager);
         this._wm.init(data);
     }
 
@@ -59,7 +60,7 @@ export class ActorManager extends EntityManager {
 
         if (DataManager.Instance.jm.input.length() > 0) {
             const { x, y } = DataManager.Instance.jm.input;
-            DataManager.Instance.applyInput({
+            EventManager.Instance.emit(EventEnum.ClientSync, {
                 type: InputTypeEnum.ActorMove,
                 id: this.id,
                 direction: { x, y },

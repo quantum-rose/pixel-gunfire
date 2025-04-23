@@ -1,9 +1,11 @@
 import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame } from 'cc';
-import { EntityTypeEnum, InputTypeEnum } from '../Common';
+import { ApiMsgEnum, EntityTypeEnum, IInput, InputTypeEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
-import { PrefabPathEnum, TexturePathEnum } from '../Enum';
+import { EventEnum, PrefabPathEnum, TexturePathEnum } from '../Enum';
 import DataManager from '../Global/DataManager';
+import EventManager from '../Global/EventManager';
+import { NetworkManager } from '../Global/NetworkManager';
 import { ObjectPoolManager } from '../Global/ObjectPoolManager';
 import { ResourceManager } from '../Global/ResourceManager';
 import { JoyStickManager } from '../UI/JoyStickManager';
@@ -17,16 +19,26 @@ export class BattleManager extends Component {
 
     private _shouldUpdate: boolean = false;
 
-    protected onLoad(): void {
-        this._stage = this.node.getChildByName('Stage');
-        this._ui = this.node.getChildByName('UI');
+    protected async onLoad(): Promise<void> {
+        this._clearGame();
+        await Promise.all([this._loadResources(), this._connectServer()]);
+        this._initGame();
+    }
 
-        this._stage.destroyAllChildren();
-
+    private _initGame() {
+        NetworkManager.Instance.listen(ApiMsgEnum.MsgServerSync, this._onServerSync, this);
+        EventManager.Instance.on(EventEnum.ClientSync, this._onClientSync, this);
         DataManager.Instance.jm = this._ui.getComponentInChildren(JoyStickManager);
-        DataManager.Instance.stage = this._stage;
+        this._initMap();
+        this._shouldUpdate = true;
+    }
 
-        this._loadResources();
+    private _clearGame() {
+        NetworkManager.Instance.unlisten(ApiMsgEnum.MsgServerSync, this._onServerSync, this);
+        EventManager.Instance.off(EventEnum.ClientSync, this._onClientSync, this);
+        DataManager.Instance.stage = this._stage = this.node.getChildByName('Stage');
+        this._ui = this.node.getChildByName('UI');
+        this._stage.destroyAllChildren();
     }
 
     private async _loadResources() {
@@ -47,10 +59,29 @@ export class BattleManager extends Component {
         }
 
         await Promise.all(list);
+    }
 
-        this._initMap();
+    private async _connectServer() {
+        try {
+            await NetworkManager.Instance.connect();
+        } catch (_error) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await this._connectServer();
+        }
+    }
 
-        this._shouldUpdate = true;
+    private _onServerSync(data: any) {
+        for (const input of data.inputs) {
+            DataManager.Instance.applyInput(input);
+        }
+    }
+
+    private _onClientSync(input: IInput) {
+        const data = {
+            input,
+            frameId: DataManager.Instance.frameId++,
+        };
+        NetworkManager.Instance.send(ApiMsgEnum.MsgClientSync, data);
     }
 
     protected update(dt: number): void {

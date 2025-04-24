@@ -153,7 +153,7 @@ export class BattleManager extends Component {
     }
 
     private _renderStage() {
-        const myPlayer = DataManager.Instance.state.actors.find(actor => actor.id === DataManager.Instance.myPlayerId);
+        const myPlayer = DataManager.Instance.state.actors.find(actor => DataManager.Instance.isMe(actor.id));
         if (!myPlayer) {
             return;
         }

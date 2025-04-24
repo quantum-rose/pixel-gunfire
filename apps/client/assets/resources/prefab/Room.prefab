@@ -290,7 +290,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Enter",
+    "_name": "Join",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -321,7 +321,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 460,
+      "x": 446.5,
       "y": 0,
       "z": 0
     },
@@ -448,7 +448,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "进入",
+    "_string": "加入房间",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 17.5,
@@ -521,7 +521,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 40,
+      "width": 67,
       "height": 26
     },
     "_anchorPoint": {
@@ -646,7 +646,7 @@
     },
     "component": "",
     "_componentId": "5c9b3fiwWNOwJ3nknq8LJ+u",
-    "handler": "handleClickEnter",
+    "handler": "handleClickJoin",
     "customEventData": ""
   },
   {
@@ -776,6 +776,12 @@
     },
     "nameLabel": {
       "__id__": 5
+    },
+    "joinButton": {
+      "__id__": 23
+    },
+    "joinButtonLabel": {
+      "__id__": 16
     },
     "_id": ""
   },

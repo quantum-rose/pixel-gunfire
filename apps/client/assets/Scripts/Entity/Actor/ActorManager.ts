@@ -22,7 +22,7 @@ export class ActorManager extends EntityManager {
     public init(data: IActor) {
         this.id = data.id;
         this._hp = this.node.getChildByName('HP');
-        if (this.id === DataManager.Instance.myPlayerId) {
+        if (DataManager.Instance.isMe(this.id)) {
             this._hp.getComponentInChildren(Sprite).color = new Color(0, 220, 0, 255);
         } else {
             this._hp.getComponentInChildren(Sprite).color = new Color(255, 0, 0, 255);
@@ -60,7 +60,7 @@ export class ActorManager extends EntityManager {
     }
 
     public tick(dt: number): void {
-        if (this.id !== DataManager.Instance.myPlayerId) {
+        if (!DataManager.Instance.isMe(this.id)) {
             return;
         }
 

@@ -8,6 +8,7 @@ export interface IRoom {
     id: number;
     name: string;
     players: IPlayer[];
+    isFull: boolean;
 }
 
 export interface IApiPlayerJoinReq {
@@ -37,3 +38,15 @@ export interface IApiRoomListReq {}
 export interface IApiRoomListRes {
     list: IRoom[];
 }
+
+export interface IApiRoomJoinReq {
+    roomId: number;
+}
+
+export interface IApiRoomJoinRes {
+    room: IRoom;
+}
+
+export interface IApiRoomLeaveReq {}
+
+export interface IApiRoomLeaveRes {}

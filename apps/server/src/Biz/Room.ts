@@ -32,6 +32,7 @@ export class Room {
             id: this.id,
             name: this.name,
             players,
+            isFull: this.isFull,
         };
     }
 

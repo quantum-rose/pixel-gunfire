@@ -1,6 +1,6 @@
 import { Node, Prefab, SpriteFrame, UITransform } from 'cc';
 import Singleton from '../Base/Singleton';
-import { EntityTypeEnum, IActorMove, IBullet, IInput, InputTypeEnum, IRoom, IState, ITimePast, IWeaponShoot } from '../Common';
+import { EntityTypeEnum, IActorMove, IBullet, IInput, InputTypeEnum, IPlayer, IRoom, IState, ITimePast, IWeaponShoot } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum } from '../Enum';
@@ -73,13 +73,15 @@ export default class DataManager extends Singleton {
         nextBulletId: 1,
     };
 
-    public myPlayerId: number = null;
-
-    public myNickname: string = null;
+    public playerInfo: IPlayer = null;
 
     public roomInfo: IRoom = null;
 
     public frameId = 1;
+
+    public isMe(id: number) {
+        return this.playerInfo && this.playerInfo.id === id;
+    }
 
     public applyInput(input: IInput) {
         switch (input.type) {

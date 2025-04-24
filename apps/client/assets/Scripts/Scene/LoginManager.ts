@@ -39,8 +39,7 @@ export class LoginManager extends Component {
 
         if (success) {
             this._errorMessage.string = '';
-            DataManager.Instance.myPlayerId = res.player.id;
-            DataManager.Instance.myNickname = res.player.nickname;
+            DataManager.Instance.playerInfo = res.player;
 
             director.loadScene(SceneEnum.Hall);
         } else {

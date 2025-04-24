@@ -36,7 +36,7 @@ export class WeaponManager extends EntityManager {
     }
 
     private _onWeaponShoot() {
-        if (this._owner !== DataManager.Instance.myPlayerId) {
+        if (!DataManager.Instance.isMe(this._owner)) {
             return;
         }
 

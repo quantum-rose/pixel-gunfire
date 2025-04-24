@@ -1,6 +1,7 @@
 import Singleton from '../Base/Singleton';
 import { ApiMsgEnum, IRoom } from '../Common';
 import type { Player } from './Player';
+import { PlayerManager } from './PlayerManager';
 import { Room } from './Room';
 
 export class RoomManager extends Singleton {
@@ -34,11 +35,22 @@ export class RoomManager extends Singleton {
 
     public syncRooms() {
         const roomList = this.dumpAllRooms();
-        this._id2Room.forEach(room => {
-            room.players.forEach(player => {
-                player.connection.send(ApiMsgEnum.MsgRoomList, {
-                    list: roomList,
-                });
+        PlayerManager.Instance.getAllPlayers().forEach(player => {
+            player.connection.send(ApiMsgEnum.MsgRoomList, {
+                list: roomList,
+            });
+        });
+    }
+
+    public syncRoom(roomId: number) {
+        const room = this._id2Room.get(roomId);
+        if (!room) {
+            return;
+        }
+
+        room.players.forEach(player => {
+            player.connection.send(ApiMsgEnum.MsgRoom, {
+                room: room.dump(),
             });
         });
     }

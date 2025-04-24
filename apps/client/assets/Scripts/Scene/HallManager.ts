@@ -1,5 +1,5 @@
 import { _decorator, Component, director, instantiate, Node, Prefab } from 'cc';
-import { ApiMsgEnum, IPlayer, IRoom } from '../Common';
+import { ApiMsgEnum, IMsgPlayerList, IMsgRoomList, IPlayer, IRoom } from '../Common';
 import { SceneEnum } from '../Enum';
 import DataManager from '../Global/DataManager';
 import { NetworkManager } from '../Global/NetworkManager';
@@ -20,11 +20,6 @@ export class HallManager extends Component {
 
     @property(Prefab)
     public roomPrefab: Prefab;
-
-    protected onLoad(): void {
-        this.playerContainer.destroyAllChildren();
-        this.roomContainer.destroyAllChildren();
-    }
 
     protected start(): void {
         NetworkManager.Instance.listen(ApiMsgEnum.MsgPlayerList, this._onPlayerListSync, this);
@@ -49,7 +44,7 @@ export class HallManager extends Component {
         }
     }
 
-    private _onPlayerListSync(data: { list: IPlayer[] }) {
+    private _onPlayerListSync(data: IMsgPlayerList) {
         this._renderPlayerList(data.list);
     }
 
@@ -79,7 +74,7 @@ export class HallManager extends Component {
         }
     }
 
-    private _onRoomListSync(data: { list: IRoom[] }) {
+    private _onRoomListSync(data: IMsgRoomList) {
         this._renderRoomList(data.list);
     }
 

@@ -1,4 +1,5 @@
 import Singleton from '../Base/Singleton';
+import { ApiMsgEnum, IPlayer } from '../Common';
 import type { Connection } from '../Core';
 import { Player } from './Player';
 
@@ -21,6 +22,8 @@ export class PlayerManager extends Singleton {
         this._nickname2Player.set(player.nickname, player);
         this._connection2Player.set(connection.id, player);
 
+        PlayerManager.Instance.syncPlayers();
+
         console.log(`Player joined: ${player.id}, ${player.nickname}, Total: ${this._id2Player.size}`);
 
         return player;
@@ -31,6 +34,8 @@ export class PlayerManager extends Singleton {
         this._nickname2Player.delete(player.nickname);
         this._connection2Player.delete(player.connection.id);
 
+        PlayerManager.Instance.syncPlayers();
+
         console.log(`Player left: ${player.id}, ${player.nickname}, Remaining: ${this._id2Player.size}`);
     }
 
@@ -39,6 +44,15 @@ export class PlayerManager extends Singleton {
         if (player) {
             this.removePlayer(player);
         }
+    }
+
+    public syncPlayers() {
+        const playerList = this.dumpAllPlayers();
+        this._id2Player.forEach(player => {
+            player.connection.send(ApiMsgEnum.MsgPlayerList, {
+                list: playerList,
+            });
+        });
     }
 
     public getPlayer(id: number) {
@@ -55,5 +69,13 @@ export class PlayerManager extends Singleton {
 
     public getAllPlayers() {
         return Array.from(this._id2Player.values());
+    }
+
+    public dumpAllPlayers() {
+        const players: IPlayer[] = [];
+        this._id2Player.forEach(player => {
+            players.push(player.dump());
+        });
+        return players;
     }
 }

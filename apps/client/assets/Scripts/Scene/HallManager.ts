@@ -1,5 +1,5 @@
 import { _decorator, Component, instantiate, Node, Prefab } from 'cc';
-import { ApiMsgEnum } from '../Common';
+import { ApiMsgEnum, IPlayer } from '../Common';
 import { NetworkManager } from '../Global/NetworkManager';
 import { PlayerManager } from '../UI/PlayerManager';
 const { ccclass, property } = _decorator;
@@ -13,9 +13,11 @@ export class HallManager extends Component {
     public playerPrefab: Prefab;
 
     protected onLoad(): void {
-        this.playerContainer.removeAllChildren();
+        this.playerContainer.destroyAllChildren();
+    }
 
-        NetworkManager.Instance.connect();
+    protected start(): void {
+        NetworkManager.Instance.listen(ApiMsgEnum.MsgPlayerList, this._onPlayerListSync, this);
 
         this._getPlayerList();
     }
@@ -28,15 +30,29 @@ export class HallManager extends Component {
         const { success, res, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiPlayerList, {});
 
         if (success) {
-            this.playerContainer.removeAllChildren();
-
-            for (const player of res.list) {
-                const playerNode = instantiate(this.playerPrefab);
-                playerNode.getComponent(PlayerManager).init(player);
-                this.playerContainer.addChild(playerNode);
-            }
+            this._renderPlayerList(res.list);
         } else {
             console.error('Error fetching player list:', error);
+        }
+    }
+
+    private _onPlayerListSync(data: { list: IPlayer[] }) {
+        this._renderPlayerList(data.list);
+    }
+
+    private _renderPlayerList(list: IPlayer[]) {
+        for (const child of this.playerContainer.children) {
+            child.active = false;
+        }
+
+        while (this.playerContainer.children.length < list.length) {
+            const playerNode = instantiate(this.playerPrefab);
+            playerNode.active = false;
+            playerNode.setParent(this.playerContainer);
+        }
+
+        for (let i = 0; i < list.length; i++) {
+            this.playerContainer.children[i].getComponent(PlayerManager).init(list[i]);
         }
     }
 }

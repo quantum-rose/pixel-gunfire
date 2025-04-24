@@ -9,5 +9,6 @@ export class PlayerManager extends Component {
     public init(player: IPlayer) {
         this.id = player.id;
         this.node.getComponent(Label).string = player.nickname;
+        this.node.active = true;
     }
 }

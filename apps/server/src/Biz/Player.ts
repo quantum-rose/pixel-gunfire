@@ -1,3 +1,4 @@
+import { IPlayer } from '../Common';
 import { Connection } from '../Core';
 
 export class Player {
@@ -15,5 +16,13 @@ export class Player {
         this.id = Player._nextId++;
         this.nickname = nickname;
         this.connection = connection;
+    }
+
+    public dump(): IPlayer {
+        return {
+            id: this.id,
+            nickname: this.nickname,
+            roomId: this.roomId,
+        };
     }
 }

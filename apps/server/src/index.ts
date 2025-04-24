@@ -26,18 +26,12 @@ myServer.setApi(ApiMsgEnum.ApiPlayerJoin, (connection, data) => {
         throw new Error('服务器已满');
     }
 
-    const { id, nickname, roomId } = PlayerManager.Instance.createPlayer(data.nickname, connection);
-    return { player: { id, nickname, roomId } };
+    const player = PlayerManager.Instance.createPlayer(data.nickname, connection);
+    return { player: player.dump() };
 });
 
 myServer.setApi(ApiMsgEnum.ApiPlayerList, (_connection, _data) => {
-    const allPlayers = PlayerManager.Instance.getAllPlayers();
-    const playerList = allPlayers.map(player => ({
-        id: player.id,
-        nickname: player.nickname,
-        roomId: player.roomId,
-    }));
-    return { list: playerList };
+    return { list: PlayerManager.Instance.dumpAllPlayers() };
 });
 
 myServer.start();

@@ -22,8 +22,6 @@ export class PlayerManager extends Singleton {
         this._nickname2Player.set(player.nickname, player);
         this._connection2Player.set(connection.id, player);
 
-        PlayerManager.Instance.syncPlayers();
-
         console.log(`Player joined: ${player.id}, ${player.nickname}, Total: ${this._id2Player.size}`);
 
         return player;
@@ -33,8 +31,6 @@ export class PlayerManager extends Singleton {
         this._id2Player.delete(player.id);
         this._nickname2Player.delete(player.nickname);
         this._connection2Player.delete(player.connection.id);
-
-        PlayerManager.Instance.syncPlayers();
 
         console.log(`Player left: ${player.id}, ${player.nickname}, Remaining: ${this._id2Player.size}`);
     }

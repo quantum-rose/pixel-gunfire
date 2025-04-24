@@ -17,6 +17,7 @@ export class LoginManager extends Component {
         this._errorMessage.string = '';
 
         director.preloadScene(SceneEnum.Hall);
+        director.preloadScene(SceneEnum.Room);
         director.preloadScene(SceneEnum.Battle);
 
         NetworkManager.Instance.connect();

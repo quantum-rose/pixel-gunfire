@@ -8,7 +8,13 @@ export class PlayerManager extends Component {
 
     public init(player: IPlayer) {
         this.id = player.id;
-        this.node.getComponent(Label).string = player.nickname;
+
+        let state = '空闲';
+        if (player.roomId) {
+            state = `房间 ${player.roomId.toString().padStart(2, '0')}`;
+        }
+
+        this.node.getComponent(Label).string = `${player.nickname} (${state})`;
         this.node.active = true;
     }
 }

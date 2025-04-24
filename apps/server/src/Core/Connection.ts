@@ -1,5 +1,6 @@
 import { RawData, WebSocket } from 'ws';
 import { PlayerManager } from '../Biz/PlayerManager';
+import { RoomManager } from '../Biz/RoomManager';
 import { ApiMsgEnum, IModel } from '../Common';
 import type { MyServer } from './MyServer';
 
@@ -53,7 +54,16 @@ export class Connection {
     };
 
     private _onClose = () => {
-        PlayerManager.Instance.removePlayerByConnection(this.id);
+        const player = PlayerManager.Instance.getPlayerByConnection(this.id);
+        if (player) {
+            if (player.roomId) {
+                RoomManager.Instance.leaveRoom(player);
+                RoomManager.Instance.syncRooms();
+            }
+
+            PlayerManager.Instance.removePlayer(player);
+            PlayerManager.Instance.syncPlayers();
+        }
 
         this._server.removeConnection(this);
     };

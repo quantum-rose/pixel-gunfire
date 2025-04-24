@@ -10,7 +10,7 @@ export class Player {
 
     public connection: Connection;
 
-    public roomId: number;
+    public roomId: number = null;
 
     constructor(nickname: string, connection: Connection) {
         this.id = Player._nextId++;

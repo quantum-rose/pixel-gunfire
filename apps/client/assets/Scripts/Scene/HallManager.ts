@@ -1,7 +1,10 @@
-import { _decorator, Component, instantiate, Node, Prefab } from 'cc';
-import { ApiMsgEnum, IPlayer } from '../Common';
+import { _decorator, Component, director, instantiate, Node, Prefab } from 'cc';
+import { ApiMsgEnum, IPlayer, IRoom } from '../Common';
+import { SceneEnum } from '../Enum';
+import DataManager from '../Global/DataManager';
 import { NetworkManager } from '../Global/NetworkManager';
 import { PlayerManager } from '../UI/PlayerManager';
+import { RoomManager } from '../UI/RoomManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('HallManager')
@@ -12,21 +15,31 @@ export class HallManager extends Component {
     @property(Prefab)
     public playerPrefab: Prefab;
 
+    @property(Node)
+    public roomContainer: Node;
+
+    @property(Prefab)
+    public roomPrefab: Prefab;
+
     protected onLoad(): void {
         this.playerContainer.destroyAllChildren();
+        this.roomContainer.destroyAllChildren();
     }
 
     protected start(): void {
         NetworkManager.Instance.listen(ApiMsgEnum.MsgPlayerList, this._onPlayerListSync, this);
+        NetworkManager.Instance.listen(ApiMsgEnum.MsgRoomList, this._onRoomListSync, this);
 
         this._getPlayerList();
+        this._getRoomList();
+    }
+
+    protected onDestroy(): void {
+        NetworkManager.Instance.unlisten(ApiMsgEnum.MsgPlayerList, this._onPlayerListSync, this);
+        NetworkManager.Instance.unlisten(ApiMsgEnum.MsgRoomList, this._onRoomListSync, this);
     }
 
     private async _getPlayerList(): Promise<void> {
-        if (!NetworkManager.Instance.isConnected) {
-            await NetworkManager.Instance.connect();
-        }
-
         const { success, res, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiPlayerList, {});
 
         if (success) {
@@ -53,6 +66,48 @@ export class HallManager extends Component {
 
         for (let i = 0; i < list.length; i++) {
             this.playerContainer.children[i].getComponent(PlayerManager).init(list[i]);
+        }
+    }
+
+    private async _getRoomList(): Promise<void> {
+        const { success, res, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiRoomList, {});
+
+        if (success) {
+            this._renderRoomList(res.list);
+        } else {
+            console.error('Error fetching room list:', error);
+        }
+    }
+
+    private _onRoomListSync(data: { list: IRoom[] }) {
+        this._renderRoomList(data.list);
+    }
+
+    private _renderRoomList(list: IRoom[]) {
+        for (const child of this.roomContainer.children) {
+            child.active = false;
+        }
+
+        while (this.roomContainer.children.length < list.length) {
+            const roomNode = instantiate(this.roomPrefab);
+            roomNode.active = false;
+            roomNode.setParent(this.roomContainer);
+        }
+
+        for (let i = 0; i < list.length; i++) {
+            this.roomContainer.children[i].getComponent(RoomManager).init(list[i]);
+        }
+    }
+
+    public async handleClickCreateRoom() {
+        const { success, res, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiRoomCreate, { name: '' });
+
+        if (success) {
+            DataManager.Instance.roomInfo = res.room;
+
+            director.loadScene(SceneEnum.Room);
+        } else {
+            console.error('Error creating room:', error);
         }
     }
 }

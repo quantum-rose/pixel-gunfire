@@ -19,10 +19,6 @@ export class BattleManager extends Component {
 
     private _shouldUpdate: boolean = false;
 
-    protected onLoad(): void {
-        this._stage.destroyAllChildren();
-    }
-
     protected async start(): Promise<void> {
         this._clearGame();
         await Promise.all([this._loadResources(), this._connectServer()]);
@@ -41,6 +37,7 @@ export class BattleManager extends Component {
         NetworkManager.Instance.unlisten(ApiMsgEnum.MsgServerSync, this._onServerSync, this);
         EventManager.Instance.off(EventEnum.ClientSync, this._onClientSync, this);
         DataManager.Instance.stage = this._stage = this.node.getChildByName('Stage');
+        this._stage.destroyAllChildren();
         this._ui = this.node.getChildByName('UI');
     }
 

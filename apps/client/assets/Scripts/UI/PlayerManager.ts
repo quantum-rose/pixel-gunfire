@@ -16,8 +16,7 @@ export class PlayerManager extends Component {
     public init(player: IPlayer) {
         this.id = player.id;
 
-        this.nameLabel.string = player.nickname;
-        this.nameLabel.isBold = DataManager.Instance.isMe(player.id);
+        this.nameLabel.string = player.nickname + (DataManager.Instance.isMe(player.id) ? '（我）' : '');
 
         let state = '';
         if (DataManager.Instance.roomInfo !== null) {

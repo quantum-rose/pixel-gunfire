@@ -97,4 +97,15 @@ export class RoomManager extends Singleton {
             this.removeRoom(room);
         }
     }
+
+    public startRoom(room: Room) {
+        const state = room.start();
+        room.players.forEach(player => {
+            player.connection.send(ApiMsgEnum.MsgGameStart, {
+                state,
+            });
+        });
+
+        console.log(`Room started: ${room.id}, ${room.name}`);
+    }
 }

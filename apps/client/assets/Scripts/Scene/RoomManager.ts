@@ -1,5 +1,5 @@
-import { _decorator, Component, director, instantiate, Label, Node, Prefab } from 'cc';
-import { ApiMsgEnum, IMsgRoom, IPlayer } from '../Common';
+import { _decorator, Button, Component, director, instantiate, Label, Node, Prefab, UIOpacity } from 'cc';
+import { ApiMsgEnum, IMsgGameStart, IMsgRoom, IPlayer } from '../Common';
 import { SceneEnum } from '../Enum';
 import DataManager from '../Global/DataManager';
 import { NetworkManager } from '../Global/NetworkManager';
@@ -22,12 +22,14 @@ export class RoomManager extends Component {
 
     protected start(): void {
         NetworkManager.Instance.listen(ApiMsgEnum.MsgRoom, this._onRoomSync, this);
+        NetworkManager.Instance.listen(ApiMsgEnum.MsgGameStart, this._onGameStart, this);
 
         this._render();
     }
 
     protected onDestroy(): void {
         NetworkManager.Instance.unlisten(ApiMsgEnum.MsgRoom, this._onRoomSync, this);
+        NetworkManager.Instance.unlisten(ApiMsgEnum.MsgGameStart, this._onGameStart, this);
     }
 
     private _onRoomSync(data: IMsgRoom) {
@@ -39,6 +41,10 @@ export class RoomManager extends Component {
     private _render() {
         this.roomNameLabel.string = DataManager.Instance.roomInfo.name;
         this.startButton.active = DataManager.Instance.isMe(DataManager.Instance.roomInfo.ownerId);
+
+        const canStart = DataManager.Instance.roomInfo.players.length >= 2;
+        this.startButton.getComponent(Button).interactable = canStart;
+        this.startButton.getComponent(UIOpacity).opacity = canStart ? 255 : 100;
 
         this._renderPlayerList(DataManager.Instance.roomInfo.players);
     }
@@ -71,5 +77,19 @@ export class RoomManager extends Component {
         }
     }
 
-    public handleClickStart() {}
+    public async handleClickStart() {
+        const { success, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiGameStart, {});
+
+        if (success) {
+            //
+        } else {
+            console.error('Error starting game:', error);
+        }
+    }
+
+    private _onGameStart(data: IMsgGameStart) {
+        DataManager.Instance.state = data.state;
+
+        director.loadScene(SceneEnum.Battle);
+    }
 }

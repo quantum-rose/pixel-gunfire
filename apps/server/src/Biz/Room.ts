@@ -1,4 +1,5 @@
-import { IPlayer, IRoom } from '../Common';
+import { EntityTypeEnum, IActor, IPlayer, IRoom, IState } from '../Common';
+import { Vector2 } from '../Utils/Vector2';
 import { Player } from './Player';
 
 export class Room {
@@ -54,5 +55,46 @@ export class Room {
         if (this.owner === player && !this.isEmpty) {
             this.owner = [...this.players][0];
         }
+    }
+
+    public start() {
+        const range = (2 * Math.PI) / this.players.size;
+        const actors: IActor[] = [...this.players].map((player, index) => {
+            let type: EntityTypeEnum;
+            let weaponType: EntityTypeEnum;
+            let bulletType: EntityTypeEnum;
+            if (index % 2 === 0) {
+                type = EntityTypeEnum.Actor1;
+                weaponType = EntityTypeEnum.Weapon1;
+                bulletType = EntityTypeEnum.Bullet1;
+            } else {
+                type = EntityTypeEnum.Actor2;
+                weaponType = EntityTypeEnum.Weapon2;
+                bulletType = EntityTypeEnum.Bullet2;
+            }
+
+            const direction = new Vector2(1, 0).rotate((Math.random() + index) * range).normalize();
+            const position = direction.clone().scale(Math.random() * 320 + 320);
+
+            const actor: IActor = {
+                type,
+                weaponType,
+                bulletType,
+                id: player.id,
+                position: { x: position.x, y: position.y },
+                direction: { x: -direction.x, y: -direction.y },
+                hp: 100,
+                nickname: player.nickname,
+            };
+            return actor;
+        });
+
+        const state: IState = {
+            actors,
+            bullets: [],
+            nextBulletId: 1,
+        };
+
+        return state;
     }
 }

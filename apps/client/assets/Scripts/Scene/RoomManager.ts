@@ -12,6 +12,9 @@ export class RoomManager extends Component {
     public roomNameLabel: Label;
 
     @property(Node)
+    public startButton: Node;
+
+    @property(Node)
     public playerContainer: Node;
 
     @property(Prefab)
@@ -20,7 +23,7 @@ export class RoomManager extends Component {
     protected start(): void {
         NetworkManager.Instance.listen(ApiMsgEnum.MsgRoom, this._onRoomSync, this);
 
-        this._renderRoom();
+        this._render();
     }
 
     protected onDestroy(): void {
@@ -30,11 +33,12 @@ export class RoomManager extends Component {
     private _onRoomSync(data: IMsgRoom) {
         DataManager.Instance.roomInfo = data.room;
 
-        this._renderRoom();
+        this._render();
     }
 
-    private _renderRoom() {
+    private _render() {
         this.roomNameLabel.string = DataManager.Instance.roomInfo.name;
+        this.startButton.active = DataManager.Instance.isMe(DataManager.Instance.roomInfo.ownerId);
 
         this._renderPlayerList(DataManager.Instance.roomInfo.players);
     }
@@ -51,7 +55,7 @@ export class RoomManager extends Component {
         }
 
         for (let i = 0; i < list.length; i++) {
-            this.playerContainer.children[i].getComponent(PlayerManager).init(list[i], false);
+            this.playerContainer.children[i].getComponent(PlayerManager).init(list[i]);
         }
     }
 

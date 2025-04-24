@@ -1,4 +1,4 @@
-import { _decorator, Component, director, instantiate, Node, Prefab } from 'cc';
+import { _decorator, Component, director, instantiate, Label, Node, Prefab } from 'cc';
 import { ApiMsgEnum, IMsgPlayerList, IMsgRoomList, IPlayer, IRoom } from '../Common';
 import { SceneEnum } from '../Enum';
 import DataManager from '../Global/DataManager';
@@ -9,6 +9,9 @@ const { ccclass, property } = _decorator;
 
 @ccclass('HallManager')
 export class HallManager extends Component {
+    @property(Label)
+    public playerNameLabel: Label;
+
     @property(Node)
     public playerContainer: Node;
 
@@ -20,6 +23,10 @@ export class HallManager extends Component {
 
     @property(Prefab)
     public roomPrefab: Prefab;
+
+    protected onLoad(): void {
+        this.playerNameLabel.string = DataManager.Instance.playerInfo.nickname;
+    }
 
     protected start(): void {
         NetworkManager.Instance.listen(ApiMsgEnum.MsgPlayerList, this._onPlayerListSync, this);

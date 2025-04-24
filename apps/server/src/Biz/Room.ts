@@ -8,19 +8,24 @@ export class Room {
 
     public name: string;
 
+    public owner: Player;
+
     public players = new Set<Player>();
 
+    public maxPlayers: number = 4;
+
     public get isFull() {
-        return this.players.size >= 4;
+        return this.players.size >= this.maxPlayers;
     }
 
     public get isEmpty() {
         return this.players.size === 0;
     }
 
-    constructor(_name: string) {
+    constructor(owner: Player) {
         this.id = Room._nextId++;
         this.name = `房间 ${this.id.toString().padStart(2, '0')}`;
+        this.owner = owner;
     }
 
     public dump(): IRoom {
@@ -31,8 +36,9 @@ export class Room {
         return {
             id: this.id,
             name: this.name,
+            ownerId: this.owner.id,
             players,
-            isFull: this.isFull,
+            maxPlayers: this.maxPlayers,
         };
     }
 
@@ -44,5 +50,9 @@ export class Room {
     public removePlayer(player: Player) {
         this.players.delete(player);
         player.roomId = null;
+
+        if (this.owner === player && !this.isEmpty) {
+            this.owner = [...this.players][0];
+        }
     }
 }

@@ -68,7 +68,7 @@ myServer.setApi(ApiMsgEnum.ApiRoomCreate, (connection, data) => {
         throw new Error('房间数量已达上限');
     }
 
-    const room = RoomManager.Instance.createRoom(data.name);
+    const room = RoomManager.Instance.createRoom(player);
 
     RoomManager.Instance.joinRoom(player, room);
 

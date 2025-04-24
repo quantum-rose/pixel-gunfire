@@ -20,10 +20,13 @@ export class RoomManager extends Component {
 
     public init(room: IRoom) {
         this.id = room.id;
-        this.nameLabel.string = `${room.name} (${room.players.length})`;
-        this.joinButton.interactable = !room.isFull;
-        this.joinButtonLabel.string = room.isFull ? '人数已满' : '加入房间';
-        this.joinButtonLabel.color = room.isFull ? new Color(128, 128, 128) : new Color(255, 255, 255);
+        this.nameLabel.string = `${room.name}  ( ${room.players.length} / ${room.maxPlayers} )`;
+
+        const isFull = room.players.length >= room.maxPlayers;
+        this.joinButton.interactable = !isFull;
+        this.joinButtonLabel.string = isFull ? '人数已满' : '加入房间';
+        this.joinButtonLabel.color = isFull ? new Color(128, 128, 128) : new Color(255, 255, 255);
+
         this.node.active = true;
     }
 

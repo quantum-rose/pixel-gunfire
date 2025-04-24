@@ -16,8 +16,8 @@ export class RoomManager extends Singleton {
         return this._id2Room.size >= 25;
     }
 
-    public createRoom(name: string) {
-        const room = new Room(name);
+    public createRoom(owner: Player) {
+        const room = new Room(owner);
         this._id2Room.set(room.id, room);
         this._name2Room.set(room.name, room);
 

@@ -8,18 +8,25 @@ export class PlayerManager extends Component {
     @property(Label)
     public nameLabel: Label;
 
+    @property(Label)
+    public stateLabel: Label;
+
     public id: number;
 
-    public init(player: IPlayer, showState: boolean = true) {
+    public init(player: IPlayer) {
         this.id = player.id;
 
-        let state = '空闲';
-        if (player.roomId) {
-            state = `房间 ${player.roomId.toString().padStart(2, '0')}`;
-        }
-
-        this.nameLabel.string = showState ? `${player.nickname} (${state})` : player.nickname;
+        this.nameLabel.string = player.nickname;
         this.nameLabel.isBold = DataManager.Instance.isMe(player.id);
+
+        let state = '';
+        if (DataManager.Instance.roomInfo !== null) {
+            state = player.id === DataManager.Instance.roomInfo.ownerId ? '房主' : '';
+        } else {
+            state = player.roomId ? `房间 ${player.roomId.toString().padStart(2, '0')}` : '空闲';
+        }
+        this.stateLabel.string = state;
+
         this.node.active = true;
     }
 }

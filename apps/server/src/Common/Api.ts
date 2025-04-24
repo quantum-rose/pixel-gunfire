@@ -7,8 +7,9 @@ export interface IPlayer {
 export interface IRoom {
     id: number;
     name: string;
+    ownerId: number;
     players: IPlayer[];
-    isFull: boolean;
+    maxPlayers: number;
 }
 
 export interface IApiPlayerJoinReq {

@@ -99,7 +99,7 @@ export class RoomManager extends Singleton {
     }
 
     public startRoom(room: Room) {
-        room.start();
+        // room.start();
 
         console.log(`Room started: ${room.id}, ${room.name}`);
     }

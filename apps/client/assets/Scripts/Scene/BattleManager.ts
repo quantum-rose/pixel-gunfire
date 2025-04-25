@@ -110,14 +110,14 @@ export class BattleManager extends Component {
     }
 
     private _tickActors(dt: number) {
-        for (const actor of DataManager.Instance.state.actors) {
+        for (const actor of DataManager.Instance.state.actors.values()) {
             const am = DataManager.Instance.actorMap.get(actor.id);
             am.tick(dt);
         }
     }
 
     private _renderActors() {
-        for (const actor of DataManager.Instance.state.actors) {
+        for (const actor of DataManager.Instance.state.actors.values()) {
             let am = DataManager.Instance.actorMap.get(actor.id);
             if (!am) {
                 const prefab = DataManager.Instance.prefabMap.get(actor.type);
@@ -145,7 +145,7 @@ export class BattleManager extends Component {
     }
 
     private _renderStage() {
-        const myPlayer = DataManager.Instance.state.actors.find(actor => DataManager.Instance.isMe(actor.id));
+        const myPlayer = DataManager.Instance.state.actors.get(DataManager.Instance.playerInfo.id);
         if (!myPlayer) {
             return;
         }

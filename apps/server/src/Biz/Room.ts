@@ -1,4 +1,4 @@
-import { ApiMsgEnum, EntityTypeEnum, IActor, IClientInput, IMsgClientSync, InputTypeEnum, IPlayer, IRoom, IState } from '../Common';
+import { ApiMsgEnum, EntityTypeEnum, IActor, IClientInput, IMsgClientSync, InputTypeEnum, IPlayer, IRoom, State } from '../Common';
 import type { Connection } from '../Core';
 import { Vector2 } from '../Utils/Vector2';
 import { Player } from './Player';
@@ -23,6 +23,8 @@ export class Room {
     public get isEmpty() {
         return this.players.size === 0;
     }
+
+    public state = new State();
 
     private _pendingInput: IClientInput[] = [];
 
@@ -55,63 +57,57 @@ export class Room {
     public addPlayer(player: Player) {
         this.players.add(player);
         player.roomId = this.id;
+        this._addActor(player);
+        player.connection.listen(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
+    }
+
+    private _addActor(player: Player) {
+        let type: EntityTypeEnum;
+        let weaponType: EntityTypeEnum;
+        let bulletType: EntityTypeEnum;
+        if (player.id + (this.id % 2) === 0) {
+            type = EntityTypeEnum.Actor1;
+            weaponType = EntityTypeEnum.Weapon1;
+            bulletType = EntityTypeEnum.Bullet1;
+        } else {
+            type = EntityTypeEnum.Actor2;
+            weaponType = EntityTypeEnum.Weapon2;
+            bulletType = EntityTypeEnum.Bullet2;
+        }
+
+        const direction = new Vector2(1, 0).rotate(Math.random() * 2 * Math.PI).normalize();
+        const position = direction.clone().scale((Math.random() + 1) * 320);
+
+        const actor: IActor = {
+            type,
+            weaponType,
+            bulletType,
+            id: player.id,
+            position: { x: position.x, y: position.y },
+            direction: { x: -direction.x, y: -direction.y },
+            hp: 100,
+            nickname: player.nickname,
+        };
+
+        this.state.addActor(actor);
     }
 
     public removePlayer(player: Player) {
         this.players.delete(player);
         player.roomId = null;
+        this._removeActor(player);
+        player.connection.unlisten(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
 
         if (this.owner === player && !this.isEmpty) {
             this.owner = [...this.players][0];
         }
     }
 
+    private _removeActor(player: Player) {
+        this.state.removeActor(player.id);
+    }
+
     public start() {
-        const range = (2 * Math.PI) / this.players.size;
-        const actors: IActor[] = [...this.players].map((player, index) => {
-            let type: EntityTypeEnum;
-            let weaponType: EntityTypeEnum;
-            let bulletType: EntityTypeEnum;
-            if (index % 2 === 0) {
-                type = EntityTypeEnum.Actor1;
-                weaponType = EntityTypeEnum.Weapon1;
-                bulletType = EntityTypeEnum.Bullet1;
-            } else {
-                type = EntityTypeEnum.Actor2;
-                weaponType = EntityTypeEnum.Weapon2;
-                bulletType = EntityTypeEnum.Bullet2;
-            }
-
-            const direction = new Vector2(1, 0).rotate((Math.random() + index) * range).normalize();
-            const position = direction.clone().scale(Math.random() * 320 + 320);
-
-            const actor: IActor = {
-                type,
-                weaponType,
-                bulletType,
-                id: player.id,
-                position: { x: position.x, y: position.y },
-                direction: { x: -direction.x, y: -direction.y },
-                hp: 100,
-                nickname: player.nickname,
-            };
-            return actor;
-        });
-
-        const state: IState = {
-            actors,
-            bullets: [],
-            nextBulletId: 1,
-        };
-
-        this.players.forEach(player => {
-            player.connection.send(ApiMsgEnum.MsgGameStart, {
-                state,
-            });
-
-            player.connection.listen(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
-        });
-
         this._timePastTimer = setInterval(() => {
             this._timePast();
         }, 1000 / 60);
@@ -122,10 +118,6 @@ export class Room {
     }
 
     public stop() {
-        this.players.forEach(player => {
-            player.connection.unlisten(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
-        });
-
         this._lastTime = null;
         if (this._timePastTimer) {
             clearInterval(this._timePastTimer);
@@ -136,8 +128,6 @@ export class Room {
             clearInterval(this._syncTimer);
             this._syncTimer = null;
         }
-
-        this._pendingInput.length = 0;
     }
 
     private _timePast() {
@@ -158,6 +148,10 @@ export class Room {
         if (this._pendingInput.length === 0) {
             return;
         }
+
+        this._pendingInput.forEach(input => {
+            this.state.applyInput(input);
+        });
 
         this.players.forEach(player => {
             player.connection.send(ApiMsgEnum.MsgServerSync, {

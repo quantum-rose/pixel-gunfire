@@ -106,8 +106,9 @@ export class HallManager extends Component {
 
         if (success) {
             DataManager.Instance.roomInfo = res.room;
+            DataManager.Instance.loadState(res.state);
 
-            director.loadScene(SceneEnum.Room);
+            director.loadScene(SceneEnum.Battle);
         } else {
             console.error('Error creating room:', error);
         }

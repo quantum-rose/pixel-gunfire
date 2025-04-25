@@ -71,6 +71,7 @@ myServer.setApi(ApiMsgEnum.ApiRoomCreate, (connection, data) => {
     }
 
     const room = RoomManager.Instance.createRoom(player);
+    room.start();
 
     RoomManager.Instance.joinRoom(player, room);
 
@@ -78,7 +79,7 @@ myServer.setApi(ApiMsgEnum.ApiRoomCreate, (connection, data) => {
     RoomManager.Instance.syncRoom(room.id);
     PlayerManager.Instance.syncPlayers();
 
-    return { room: room.dump() };
+    return { room: room.dump(), state: room.state.dump() };
 });
 
 /**
@@ -109,7 +110,7 @@ myServer.setApi(ApiMsgEnum.ApiRoomJoin, (connection, data) => {
     RoomManager.Instance.syncRoom(room.id);
     PlayerManager.Instance.syncPlayers();
 
-    return { room: room.dump() };
+    return { room: room.dump(), state: room.state.dump() };
 });
 
 /**

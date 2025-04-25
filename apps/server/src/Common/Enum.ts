@@ -31,3 +31,10 @@ export enum ApiMsgEnum {
     MsgClientSync = 'MsgClientSync',
     MsgServerSync = 'MsgServerSync',
 }
+
+export enum StateEventEnum {
+    /**
+     * 子弹命中目标后爆炸
+     */
+    ExplosionBorn = 'ExplosionBorn',
+}

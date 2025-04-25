@@ -35,8 +35,9 @@ export class RoomManager extends Component {
 
         if (success) {
             DataManager.Instance.roomInfo = res.room;
+            DataManager.Instance.loadState(res.state);
 
-            director.loadScene(SceneEnum.Room);
+            director.loadScene(SceneEnum.Battle);
         } else {
             console.error('Error joining room:', error);
         }

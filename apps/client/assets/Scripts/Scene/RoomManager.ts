@@ -88,7 +88,7 @@ export class RoomManager extends Component {
     }
 
     private _onGameStart(data: IMsgGameStart) {
-        DataManager.Instance.state = data.state;
+        DataManager.Instance.loadState(data.state);
 
         director.loadScene(SceneEnum.Battle);
     }

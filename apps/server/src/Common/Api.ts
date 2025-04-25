@@ -1,3 +1,5 @@
+import { IState } from './State';
+
 export interface IPlayer {
     id: number;
     nickname: string;
@@ -32,6 +34,7 @@ export interface IApiRoomCreateReq {
 
 export interface IApiRoomCreateRes {
     room: IRoom;
+    state: IState;
 }
 
 export interface IApiRoomListReq {}
@@ -46,6 +49,7 @@ export interface IApiRoomJoinReq {
 
 export interface IApiRoomJoinRes {
     room: IRoom;
+    state: IState;
 }
 
 export interface IApiRoomLeaveReq {}

@@ -35,7 +35,7 @@ export class NetworkManager extends Singleton {
 
         if (this._connecting === null) {
             this._connecting = new Promise<void>((resolve, reject) => {
-                this._ws = new WebSocket('ws://localhost:9876');
+                this._ws = new WebSocket('ws://122.51.127.27:9876');
 
                 this._ws.onopen = () => {
                     this._connecting = null;

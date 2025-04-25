@@ -4,7 +4,9 @@ import { ApiMsgEnum } from './Common';
 import { MyServer } from './Core';
 import { symlinkCommon } from './Utils';
 
-symlinkCommon();
+if (process.env.NODE_ENV === 'development') {
+    symlinkCommon();
+}
 
 const myServer = new MyServer({
     port: 9876,

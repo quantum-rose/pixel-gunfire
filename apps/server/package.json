@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node ./src/index -e ts"
+    "dev": "NODE_ENV=development nodemon --exec ts-node ./src/index -e ts",
+    "build": "esbuild ./src/index.ts --bundle --platform=node --outfile=dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -12,6 +13,7 @@
   "devDependencies": {
     "@types/node": "^18.11.7",
     "@types/ws": "^8.5.3",
+    "esbuild": "^0.25.3",
     "eslint": "^8.26.0",
     "nodemon": "^2.0.20",
     "ts-node": "^10.9.1",

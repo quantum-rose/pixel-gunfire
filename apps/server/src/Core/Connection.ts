@@ -48,7 +48,7 @@ export class Connection {
             }
         } else if (this._msgMap.has(name)) {
             this._msgMap.get(name).forEach(({ cb, ctx }) => {
-                cb.call(ctx, data);
+                cb.call(ctx, this, data);
             });
         }
     };
@@ -76,7 +76,7 @@ export class Connection {
         this._ws.send(message);
     }
 
-    public listen<T extends keyof IModel['msg']>(name: T, cb: (args: IModel['msg'][T]) => void, ctx: unknown) {
+    public listen<T extends keyof IModel['msg']>(name: T, cb: (connection: Connection, args: IModel['msg'][T]) => void, ctx: unknown) {
         if (this._msgMap.has(name)) {
             this._msgMap.get(name).push({ cb, ctx });
         } else {
@@ -84,7 +84,7 @@ export class Connection {
         }
     }
 
-    public unlisten<T extends keyof IModel['msg']>(name: T, cb: (args: IModel['msg'][T]) => void, ctx: unknown) {
+    public unlisten<T extends keyof IModel['msg']>(name: T, cb: (connection: Connection, args: IModel['msg'][T]) => void, ctx: unknown) {
         if (this._msgMap.has(name)) {
             const list = this._msgMap.get(name);
             const index = list.findIndex(item => item.cb === cb && item.ctx === ctx);

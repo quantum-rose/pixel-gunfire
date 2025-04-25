@@ -49,4 +49,4 @@ export interface ITimePast {
     dt: number;
 }
 
-export type IInput = IActorMove | IWeaponShoot | ITimePast;
+export type IClientInput = IActorMove | IWeaponShoot | ITimePast;

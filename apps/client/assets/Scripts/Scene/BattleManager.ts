@@ -1,5 +1,5 @@
-import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame } from 'cc';
-import { ApiMsgEnum, EntityTypeEnum, IInput, IMsgServerSync, InputTypeEnum } from '../Common';
+import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
+import { ApiMsgEnum, EntityTypeEnum, IClientInput, IMsgServerSync, InputTypeEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum, PrefabPathEnum, TexturePathEnum } from '../Enum';
@@ -76,7 +76,7 @@ export class BattleManager extends Component {
         }
     }
 
-    private _onClientSync(input: IInput) {
+    private _onClientSync(input: IClientInput) {
         const data = {
             input,
             frameId: DataManager.Instance.frameId++,
@@ -154,6 +154,18 @@ export class BattleManager extends Component {
         if (!myPlayer) {
             return;
         }
-        this._stage.setPosition(-myPlayer.position.x, -myPlayer.position.y);
+
+        const targetPosition = new Vec3(-myPlayer.position.x, -myPlayer.position.y);
+
+        if (DataManager.Instance.jm.input) {
+            // 虚拟摇杆有输入
+            const input = DataManager.Instance.jm.input;
+            const leadFactor = 160; // 视野前方的偏移量
+            targetPosition.x -= input.x * leadFactor;
+            targetPosition.y -= input.y * leadFactor;
+        }
+
+        // 缓动镜头位置
+        this._stage.setPosition(Vec3.lerp(new Vec3(), this._stage.getPosition(), targetPosition, 0.1));
     }
 }

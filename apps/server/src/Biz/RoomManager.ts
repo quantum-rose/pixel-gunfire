@@ -99,12 +99,7 @@ export class RoomManager extends Singleton {
     }
 
     public startRoom(room: Room) {
-        const state = room.start();
-        room.players.forEach(player => {
-            player.connection.send(ApiMsgEnum.MsgGameStart, {
-                state,
-            });
-        });
+        room.start();
 
         console.log(`Room started: ${room.id}, ${room.name}`);
     }

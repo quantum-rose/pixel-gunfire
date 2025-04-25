@@ -16,13 +16,19 @@ export class PlayerManager extends Component {
     public init(player: IPlayer) {
         this.id = player.id;
 
-        this.nameLabel.string = player.nickname + (DataManager.Instance.isMe(player.id) ? '（我）' : '');
+        this.nameLabel.string = player.nickname;
 
         let state = '';
         if (DataManager.Instance.roomInfo !== null) {
             state = player.id === DataManager.Instance.roomInfo.ownerId ? '房主' : '';
         } else {
-            state = player.roomId ? `房间 ${player.roomId.toString().padStart(2, '0')}` : '空闲';
+            if (DataManager.Instance.isMe(player.id)) {
+                state = '我';
+            } else if (player.roomId) {
+                state = `房间 ${player.roomId.toString().padStart(2, '0')}`;
+            } else {
+                state = '空闲';
+            }
         }
         this.stateLabel.string = state;
 

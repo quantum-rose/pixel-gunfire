@@ -3,6 +3,6 @@
     "version": "0.2",
     "language": "en,en-US",
     "allowCompoundWords": true,
-    "words": ["ccclass", "unlisten"],
+    "words": ["ccclass", "unlisten", "lerp"],
     "ignorePaths": []
 }

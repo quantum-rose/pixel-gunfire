@@ -1,13 +1,13 @@
 import { IPlayer, IRoom } from './Api';
-import { IInput, IState } from './State';
+import { IClientInput, IState } from './State';
 
 export interface IMsgClientSync {
-    input: IInput;
+    input: IClientInput;
     frameId: number;
 }
 
 export interface IMsgServerSync {
-    inputs: IInput[];
+    inputs: IClientInput[];
     lastFrameId: number;
 }
 

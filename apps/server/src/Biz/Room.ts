@@ -1,4 +1,5 @@
-import { EntityTypeEnum, IActor, IPlayer, IRoom, IState } from '../Common';
+import { ApiMsgEnum, EntityTypeEnum, IActor, IClientInput, IMsgClientSync, IPlayer, IRoom, IState } from '../Common';
+import type { Connection } from '../Core';
 import { Vector2 } from '../Utils/Vector2';
 import { Player } from './Player';
 
@@ -22,6 +23,10 @@ export class Room {
     public get isEmpty() {
         return this.players.size === 0;
     }
+
+    private _pendingInput: IClientInput[] = [];
+
+    private _syncTimer: NodeJS.Timer | null = null;
 
     constructor(owner: Player) {
         this.id = Room._nextId++;
@@ -95,6 +100,41 @@ export class Room {
             nextBulletId: 1,
         };
 
-        return state;
+        this.players.forEach(player => {
+            player.connection.send(ApiMsgEnum.MsgGameStart, {
+                state,
+            });
+
+            player.connection.listen(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
+        });
+
+        this._syncTimer = setInterval(() => {
+            this._sendServerSync();
+        }, 0);
+    }
+
+    public stop() {
+        this.players.forEach(player => {
+            player.connection.unlisten(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
+        });
+
+        if (this._syncTimer) {
+            clearInterval(this._syncTimer);
+            this._syncTimer = null;
+        }
+    }
+
+    private _getClientSync(connection: Connection, { input, frameId }: IMsgClientSync) {
+        this._pendingInput.push(input);
+    }
+
+    private _sendServerSync() {
+        this.players.forEach(player => {
+            player.connection.send(ApiMsgEnum.MsgServerSync, {
+                lastFrameId: 0,
+                inputs: this._pendingInput,
+            });
+        });
+        this._pendingInput.length = 0;
     }
 }

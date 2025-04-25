@@ -1,5 +1,5 @@
 import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
-import { ApiMsgEnum, EntityTypeEnum, IClientInput, IMsgServerSync, InputTypeEnum } from '../Common';
+import { ApiMsgEnum, EntityTypeEnum, IClientInput, IMsgServerSync } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum, PrefabPathEnum, TexturePathEnum } from '../Enum';
@@ -95,11 +95,6 @@ export class BattleManager extends Component {
 
     private _tick(dt: number) {
         this._tickActors(dt);
-
-        DataManager.Instance.applyInput({
-            type: InputTypeEnum.TimePast,
-            dt,
-        });
     }
 
     private _render() {

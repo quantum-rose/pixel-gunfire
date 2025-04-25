@@ -1,4 +1,4 @@
-import { ApiMsgEnum, EntityTypeEnum, IActor, IClientInput, IMsgClientSync, IPlayer, IRoom, IState } from '../Common';
+import { ApiMsgEnum, EntityTypeEnum, IActor, IClientInput, IMsgClientSync, InputTypeEnum, IPlayer, IRoom, IState } from '../Common';
 import type { Connection } from '../Core';
 import { Vector2 } from '../Utils/Vector2';
 import { Player } from './Player';
@@ -25,6 +25,10 @@ export class Room {
     }
 
     private _pendingInput: IClientInput[] = [];
+
+    private _lastTime: number = null;
+
+    private _timePastTimer: NodeJS.Timer | null = null;
 
     private _syncTimer: NodeJS.Timer | null = null;
 
@@ -108,6 +112,10 @@ export class Room {
             player.connection.listen(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
         });
 
+        this._timePastTimer = setInterval(() => {
+            this._timePast();
+        }, 1000 / 60);
+
         this._syncTimer = setInterval(() => {
             this._sendServerSync();
         }, 0);
@@ -118,10 +126,28 @@ export class Room {
             player.connection.unlisten(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
         });
 
+        this._lastTime = null;
+        if (this._timePastTimer) {
+            clearInterval(this._timePastTimer);
+            this._timePastTimer = null;
+        }
+
         if (this._syncTimer) {
             clearInterval(this._syncTimer);
             this._syncTimer = null;
         }
+
+        this._pendingInput.length = 0;
+    }
+
+    private _timePast() {
+        const now = process.uptime();
+        const dt = this._lastTime ? now - this._lastTime : 0;
+        this._pendingInput.push({
+            type: InputTypeEnum.TimePast,
+            dt,
+        });
+        this._lastTime = now;
     }
 
     private _getClientSync(connection: Connection, { input, frameId }: IMsgClientSync) {
@@ -129,6 +155,10 @@ export class Room {
     }
 
     private _sendServerSync() {
+        if (this._pendingInput.length === 0) {
+            return;
+        }
+
         this.players.forEach(player => {
             player.connection.send(ApiMsgEnum.MsgServerSync, {
                 lastFrameId: 0,

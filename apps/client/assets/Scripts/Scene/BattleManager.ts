@@ -1,5 +1,5 @@
 import { _decorator, Component, director, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
-import { ApiMsgEnum, EntityTypeEnum, IClientInput, IMsgClientSync, IMsgRoom, IMsgServerSync } from '../Common';
+import { ApiMsgEnum, IClientInput, IMsgClientSync, IMsgRoom, IMsgServerSync } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum, PrefabPathEnum, SceneEnum, TexturePathEnum } from '../Enum';
@@ -15,6 +15,8 @@ const { ccclass, property } = _decorator;
 export class BattleManager extends Component {
     private _stage: Node;
 
+    private _actorLayer: Node;
+
     private _ui: Node;
 
     private _pendingMsg: IMsgClientSync[] = [];
@@ -23,7 +25,7 @@ export class BattleManager extends Component {
 
     protected onLoad(): void {
         this._stage = this.node.getChildByName('Stage');
-        this._stage.destroyAllChildren();
+        this._actorLayer = this._stage.getChildByName('ActorLayer');
         this._ui = this.node.getChildByName('UI');
         this._pendingMsg = [];
         this._shouldUpdate = false;
@@ -54,8 +56,6 @@ export class BattleManager extends Component {
 
     protected async start(): Promise<void> {
         await Promise.all([this._loadResources(), this._connectServer()]);
-
-        this._initMap();
 
         this._shouldUpdate = true;
     }
@@ -141,12 +141,6 @@ export class BattleManager extends Component {
         this._renderStage();
     }
 
-    private _initMap() {
-        const prefab = DataManager.Instance.prefabMap.get(EntityTypeEnum.Map);
-        const node = instantiate(prefab);
-        node.setParent(this._stage);
-    }
-
     private _tickActors(dt: number) {
         for (const actor of DataManager.Instance.state.actors.values()) {
             const am = DataManager.Instance.actorMap.get(actor.id);
@@ -160,8 +154,8 @@ export class BattleManager extends Component {
             if (!am) {
                 const prefab = DataManager.Instance.prefabMap.get(actor.type);
                 const node = instantiate(prefab);
-                node.setParent(this._stage);
-                am = node.addComponent(ActorManager);
+                node.setParent(this._actorLayer);
+                am = node.getComponent(ActorManager);
                 DataManager.Instance.actorMap.set(actor.id, am);
                 am.init(actor);
             }

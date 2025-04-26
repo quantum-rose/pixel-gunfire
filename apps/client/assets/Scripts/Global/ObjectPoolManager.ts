@@ -14,8 +14,7 @@ export class ObjectPoolManager extends Singleton {
 
     public get(type: EntityTypeEnum): Node {
         if (!this._objectPool) {
-            this._objectPool = new Node('ObjectPool');
-            this._objectPool.setParent(DataManager.Instance.stage);
+            this._objectPool = DataManager.Instance.stage.getChildByName('ObjectPool');
         }
 
         if (!this._pool.has(type)) {

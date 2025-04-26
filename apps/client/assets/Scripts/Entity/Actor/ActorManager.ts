@@ -1,4 +1,4 @@
-import { _decorator, Color, instantiate, Label, Node, ProgressBar, Sprite, Tween, tween, Vec3 } from 'cc';
+import { _decorator, Color, instantiate, Label, Node, Prefab, ProgressBar, Sprite, Tween, tween, Vec3 } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
 import { IActor, InputTypeEnum, IVec2 } from '../../Common';
 import { EntityStateEnum, EventEnum } from '../../Enum';
@@ -13,11 +13,18 @@ const { ccclass, property } = _decorator;
 export class ActorManager extends EntityManager {
     public id: number;
 
-    private _wm: WeaponManager;
+    @property(Prefab)
+    public infoPrefab: Prefab;
+
+    private _infoLayer: Node;
+
+    private _info: Node;
 
     private _hp: Node;
 
     private _nickname: Node;
+
+    private _wm: WeaponManager;
 
     private _lastPos: IVec2;
 
@@ -25,22 +32,26 @@ export class ActorManager extends EntityManager {
 
     public init(data: IActor) {
         this.id = data.id;
-        this._hp = this.node.getChildByName('HP');
-        if (DataManager.Instance.isMe(this.id)) {
-            this._hp.getComponentInChildren(Sprite).color = new Color(0, 220, 0, 255);
-        } else {
-            this._hp.getComponentInChildren(Sprite).color = new Color(255, 0, 0, 255);
-        }
-        this._nickname = this.node.getChildByName('Nickname');
-        this._nickname.getComponent(Label).string = data.nickname;
-        this._lastPos = null;
-        this._tw?.stop();
-        this._tw = null;
 
         this.fsm = this.addComponent(ActorStateMachine);
         this.fsm.init(data.type);
 
         this.state = EntityStateEnum.Idle;
+
+        this._infoLayer = DataManager.Instance.stage.getChildByName('InfoLayer');
+
+        this._info = instantiate(this.infoPrefab);
+        this._info.setParent(this._infoLayer);
+
+        this._hp = this._info.getChildByName('HP');
+        if (DataManager.Instance.isMe(this.id)) {
+            this._hp.getComponentInChildren(Sprite).color = new Color(0, 220, 0, 255);
+        } else {
+            this._hp.getComponentInChildren(Sprite).color = new Color(255, 0, 0, 255);
+        }
+
+        this._nickname = this._info.getChildByName('Nickname');
+        this._nickname.getComponent(Label).string = data.nickname;
 
         const weaponPrefab = DataManager.Instance.prefabMap.get(data.weaponType);
         const weaponNode = instantiate(weaponPrefab);
@@ -48,6 +59,19 @@ export class ActorManager extends EntityManager {
         weaponNode.setPosition(0, 38);
         this._wm = weaponNode.addComponent(WeaponManager);
         this._wm.init(data);
+
+        this._lastPos = null;
+        this._tw?.stop();
+        this._tw = null;
+    }
+
+    protected onDestroy(): void {
+        this._tw?.stop();
+        this._tw = null;
+        this._info.destroy();
+        this._info = null;
+        this._hp = null;
+        this._nickname = null;
     }
 
     public render(data: IActor) {
@@ -76,10 +100,8 @@ export class ActorManager extends EntityManager {
         const rotation = radianToAngle(Math.atan2(direction.y, flipX ? -direction.x : direction.x));
         this._wm.node.setRotationFromEuler(0, 0, rotation);
 
-        this._hp.setScale(flipX ? -1 : 1, 1);
+        this._info.setPosition(this.node.position.x, this.node.position.y);
         this._hp.getComponent(ProgressBar).progress = data.hp / 100;
-
-        this._nickname.setScale(flipX ? -1 : 1, 1);
     }
 
     public tick(dt: number): void {

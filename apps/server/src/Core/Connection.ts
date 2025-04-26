@@ -1,7 +1,8 @@
-import { RawData, WebSocket } from 'ws';
+import { WebSocket } from 'ws';
 import { PlayerManager } from '../Biz/PlayerManager';
 import { RoomManager } from '../Biz/RoomManager';
-import { ApiMsgEnum, IModel } from '../Common';
+import { ApiMsgEnum, binaryDecode, binaryEncode, IModel } from '../Common';
+import { bufferToArrayBuffer } from '../Utils';
 import type { MyServer } from './MyServer';
 
 interface IItem {
@@ -29,8 +30,8 @@ export class Connection {
         this._ws.on('close', this._onClose);
     }
 
-    private _onMessage = (rawData: RawData) => {
-        const message = JSON.parse(rawData.toString());
+    private _onMessage = (rawData: Buffer) => {
+        const message = binaryDecode(bufferToArrayBuffer(rawData));
         const { name, data } = message;
 
         if (this._server.hasApi(name)) {
@@ -71,11 +72,7 @@ export class Connection {
     };
 
     public send<T extends keyof IModel['msg']>(name: T, data: IModel['msg'][T]): void {
-        const message = JSON.stringify({
-            name,
-            data,
-        });
-        this._ws.send(message);
+        this._ws.send(binaryEncode(name, data));
     }
 
     public listen<T extends keyof IModel['msg']>(name: T, cb: (connection: Connection, args: IModel['msg'][T]) => void, ctx: unknown) {

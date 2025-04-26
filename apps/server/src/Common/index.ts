@@ -1,4 +1,5 @@
 export * from './Api';
+export * from './Binary';
 export * from './Constants';
 export * from './Enum';
 export * from './Model';

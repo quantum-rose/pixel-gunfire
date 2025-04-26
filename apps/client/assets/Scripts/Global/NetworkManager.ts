@@ -1,6 +1,5 @@
 import Singleton from '../Base/Singleton';
-import { ApiMsgEnum } from '../Common';
-import { IModel } from '../Common/Model';
+import { ApiMsgEnum, binaryDecode, binaryEncode, IModel } from '../Common';
 
 interface IItem {
     cb: Function;
@@ -36,6 +35,7 @@ export class NetworkManager extends Singleton {
         if (this._connecting === null) {
             this._connecting = new Promise<void>((resolve, reject) => {
                 this._ws = new WebSocket('ws://122.51.127.27:9876');
+                this._ws.binaryType = 'arraybuffer';
 
                 this._ws.onopen = () => {
                     this._connecting = null;
@@ -50,7 +50,7 @@ export class NetworkManager extends Singleton {
                 };
 
                 this._ws.onmessage = event => {
-                    const message = JSON.parse(event.data);
+                    const message = binaryDecode(event.data);
                     const { name, data } = message;
                     if (this._map.has(name)) {
                         this._map.get(name).forEach(({ cb, ctx }) => {
@@ -91,11 +91,7 @@ export class NetworkManager extends Singleton {
     }
 
     public send<T extends keyof IModel['msg']>(name: T, data: IModel['msg'][T]) {
-        const message = JSON.stringify({
-            name,
-            data,
-        });
-        this._ws.send(message);
+        this._ws.send(binaryEncode(name, data));
     }
 
     public listen<T extends keyof IModel['msg']>(name: T, cb: (args: IModel['msg'][T]) => void, ctx: unknown) {

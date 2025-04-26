@@ -1,4 +1,4 @@
-import { ApiMsgEnum, EntityTypeEnum, IActor, IClientInput, IMsgClientSync, InputTypeEnum, IPlayer, IRoom, State } from '../Common';
+import { ApiMsgEnum, EntityTypeEnum, IActor, IClientInput, IMsgClientSync, InputTypeEnum, IPlayer, IRoom, State, toFixed } from '../Common';
 import type { Connection } from '../Core';
 import { Vector2 } from '../Utils/Vector2';
 import { Player } from './Player';
@@ -114,7 +114,7 @@ export class Room {
     public start() {
         this._timePastTimer = setInterval(() => {
             this._timePast();
-        }, 1000 / 60);
+        }, 16);
 
         this._syncTimer = setInterval(() => {
             this._sendServerSync();
@@ -139,7 +139,7 @@ export class Room {
         const dt = this._lastTime ? now - this._lastTime : 0;
         this._pendingInput.push({
             type: InputTypeEnum.TimePast,
-            dt,
+            dt: toFixed(dt),
         });
         this._lastTime = now;
     }

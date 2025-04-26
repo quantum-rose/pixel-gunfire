@@ -1,5 +1,6 @@
 import { ACTOR_SPEED, BULLET_DAMAGE, BULLET_SPEED, HIT_RADIUS, STAGE_HEIGHT, STAGE_WIDTH } from './Constants';
 import { EntityTypeEnum, InputTypeEnum, StateEventEnum } from './Enum';
+import { toFixed } from './Util';
 
 export interface IVec2 {
     x: number;
@@ -100,19 +101,22 @@ export class State {
         actor.direction.x = x;
         actor.direction.y = y;
 
-        actor.position.x += x * dt * ACTOR_SPEED;
-        actor.position.y += y * dt * ACTOR_SPEED;
+        let xPos = actor.position.x + x * dt * ACTOR_SPEED;
+        let yPos = actor.position.y + y * dt * ACTOR_SPEED;
 
-        if (actor.position.x < -STAGE_WIDTH / 2) {
-            actor.position.x = -STAGE_WIDTH / 2;
-        } else if (actor.position.x > STAGE_WIDTH / 2) {
-            actor.position.x = STAGE_WIDTH / 2;
+        if (xPos < -STAGE_WIDTH / 2) {
+            xPos = -STAGE_WIDTH / 2;
+        } else if (xPos > STAGE_WIDTH / 2) {
+            xPos = STAGE_WIDTH / 2;
         }
-        if (actor.position.y < -STAGE_HEIGHT / 2) {
-            actor.position.y = -STAGE_HEIGHT / 2;
-        } else if (actor.position.y > STAGE_HEIGHT / 2) {
-            actor.position.y = STAGE_HEIGHT / 2;
+        if (yPos < -STAGE_HEIGHT / 2) {
+            yPos = -STAGE_HEIGHT / 2;
+        } else if (yPos > STAGE_HEIGHT / 2) {
+            yPos = STAGE_HEIGHT / 2;
         }
+
+        actor.position.x = toFixed(xPos);
+        actor.position.y = toFixed(yPos);
     }
 
     private _applyWeaponShoot(input: IWeaponShoot) {
@@ -140,8 +144,8 @@ export class State {
                 this.bullets.delete(bullet.id);
                 this.emit(StateEventEnum.ExplosionBorn, bullet.id, bullet.position);
             } else {
-                bullet.position.x += bullet.direction.x * dt * BULLET_SPEED;
-                bullet.position.y += bullet.direction.y * dt * BULLET_SPEED;
+                bullet.position.x = toFixed(bullet.position.x + bullet.direction.x * dt * BULLET_SPEED);
+                bullet.position.y = toFixed(bullet.position.y + bullet.direction.y * dt * BULLET_SPEED);
             }
         }
     }

@@ -1,6 +1,6 @@
 import { _decorator, Color, instantiate, Label, Node, Prefab, ProgressBar, Sprite, Tween, tween, Vec3 } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
-import { IActor, InputTypeEnum, IVec2 } from '../../Common';
+import { IActor, InputTypeEnum, IVec2, toFixed } from '../../Common';
 import { EntityStateEnum, EventEnum } from '../../Enum';
 import DataManager from '../../Global/DataManager';
 import EventManager from '../../Global/EventManager';
@@ -114,8 +114,8 @@ export class ActorManager extends EntityManager {
             EventManager.Instance.emit(EventEnum.ClientSync, {
                 type: InputTypeEnum.ActorMove,
                 id: this.id,
-                direction: { x, y },
-                dt,
+                direction: { x: toFixed(x), y: toFixed(y) },
+                dt: toFixed(dt),
             });
         }
     }

@@ -43,4 +43,9 @@ export class ObjectPoolManager extends Singleton {
         node.active = false;
         this._pool.get(node.name as EntityTypeEnum).push(node);
     }
+
+    public clear() {
+        this._objectPool = null;
+        this._pool.clear();
+    }
 }

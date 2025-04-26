@@ -1,6 +1,6 @@
-import { _decorator, Color, instantiate, Label, Node, ProgressBar, Sprite } from 'cc';
+import { _decorator, Color, instantiate, Label, Node, ProgressBar, Sprite, Tween, tween, Vec3 } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
-import { IActor, InputTypeEnum } from '../../Common';
+import { IActor, InputTypeEnum, IVec2 } from '../../Common';
 import { EntityStateEnum, EventEnum } from '../../Enum';
 import DataManager from '../../Global/DataManager';
 import EventManager from '../../Global/EventManager';
@@ -19,6 +19,10 @@ export class ActorManager extends EntityManager {
 
     private _nickname: Node;
 
+    private _lastPos: IVec2;
+
+    private _tw: Tween<Node>;
+
     public init(data: IActor) {
         this.id = data.id;
         this._hp = this.node.getChildByName('HP');
@@ -29,6 +33,9 @@ export class ActorManager extends EntityManager {
         }
         this._nickname = this.node.getChildByName('Nickname');
         this._nickname.getComponent(Label).string = data.nickname;
+        this._lastPos = null;
+        this._tw?.stop();
+        this._tw = null;
 
         this.fsm = this.addComponent(ActorStateMachine);
         this.fsm.init(data.type);
@@ -45,7 +52,23 @@ export class ActorManager extends EntityManager {
 
     public render(data: IActor) {
         const { position, direction } = data;
-        this.node.setPosition(position.x, position.y);
+
+        if (!this._lastPos) {
+            this._lastPos = { x: position.x, y: position.y };
+            this.node.setPosition(this._lastPos.x, this._lastPos.y);
+        } else if (this._lastPos.x !== position.x || this._lastPos.y !== position.y) {
+            this.node.setPosition(this._lastPos.x, this._lastPos.y);
+            this._lastPos = { x: position.x, y: position.y };
+
+            this.state = EntityStateEnum.Run;
+            this._tw?.stop();
+            this._tw = tween(this.node)
+                .to(0.1, { position: new Vec3(position.x, position.y) })
+                .call(() => {
+                    this.state = EntityStateEnum.Idle;
+                })
+                .start();
+        }
 
         let flipX = direction.x < 0;
         this.node.setScale(flipX ? -1 : 1, 1);
@@ -72,10 +95,6 @@ export class ActorManager extends EntityManager {
                 direction: { x, y },
                 dt,
             });
-
-            this.state = EntityStateEnum.Run;
-        } else {
-            this.state = EntityStateEnum.Idle;
         }
     }
 }

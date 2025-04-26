@@ -16,6 +16,10 @@ export class ExplosionStateMachine extends StateMachine {
         this.initAnimationEvent();
     }
 
+    protected onDestroy(): void {
+        this.animationComponent.off(Animation.EventType.FINISHED, this.onAnimationFinished, this);
+    }
+
     initParams() {
         this.params.set(ParamsNameEnum.Idle, getInitParamsTrigger());
     }
@@ -25,9 +29,11 @@ export class ExplosionStateMachine extends StateMachine {
     }
 
     initAnimationEvent() {
-        this.animationComponent.on(Animation.EventType.FINISHED, () => {
-            ObjectPoolManager.Instance.ret(this.node);
-        });
+        this.animationComponent.on(Animation.EventType.FINISHED, this.onAnimationFinished, this);
+    }
+
+    onAnimationFinished() {
+        ObjectPoolManager.Instance.ret(this.node);
     }
 
     run() {

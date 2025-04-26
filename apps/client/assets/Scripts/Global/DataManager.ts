@@ -1,6 +1,6 @@
 import { Node, Prefab, SpriteFrame } from 'cc';
 import Singleton from '../Base/Singleton';
-import { IClientInput, IPlayer, IRoom, IState, IVec2, State, StateEventEnum } from '../Common';
+import { IClientInput, IMsgRoom, IPlayer, IRoom, IVec2, State, StateEventEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum } from '../Enum';
@@ -24,6 +24,8 @@ export default class DataManager extends Singleton {
 
     public bulletMap = new Map<number, BulletManager>();
 
+    public lastState = new State();
+
     public state = new State();
 
     public playerInfo: IPlayer = null;
@@ -42,8 +44,10 @@ export default class DataManager extends Singleton {
         return this.playerInfo && this.playerInfo.id === id;
     }
 
-    public loadState(state: IState) {
-        this.state.load(state);
+    public syncRoom(data: IMsgRoom) {
+        this.roomInfo = data.room;
+        this.state.load(data.state);
+        this.lastState.load(data.state);
     }
 
     public applyInput(input: IClientInput) {

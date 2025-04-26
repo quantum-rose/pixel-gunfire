@@ -21,8 +21,5 @@ export interface IMsgRoomList {
 
 export interface IMsgRoom {
     room: IRoom;
-}
-
-export interface IMsgGameStart {
     state: IState;
 }

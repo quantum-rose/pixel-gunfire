@@ -60,7 +60,7 @@ interface IItem {
 export class State {
     public actors = new Map<number, IActor>();
 
-    public bullets: IBullet[] = [];
+    public bullets = new Map<number, IBullet>();
 
     public nextBulletId = 1;
 
@@ -130,92 +130,118 @@ export class State {
             direction: { x: direction.x, y: direction.y },
         };
 
-        this.bullets.push(bullet);
+        this.bullets.set(bullet.id, bullet);
     }
 
     private _applyTimePast(input: ITimePast) {
         const { dt } = input;
-        for (let i = this.bullets.length - 1; i >= 0; i--) {
-            const bullet = this.bullets[i];
-
-            let hit = false;
-            for (const actor of this.actors.values()) {
-                if (actor.id === bullet.owner) {
-                    continue;
-                }
-
-                if ((bullet.position.x - actor.position.x) ** 2 + (bullet.position.y - actor.position.y - 40) ** 2 < HIT_RADIUS ** 2) {
-                    actor.hp -= BULLET_DAMAGE;
-                    this.bullets.splice(i, 1);
-                    this.emit(StateEventEnum.ExplosionBorn, bullet.id, bullet.position);
-                    hit = true;
-                    break;
-                }
-            }
-
-            if (hit) {
-                continue;
-            }
-
-            if (
-                bullet.position.x < -STAGE_WIDTH / 2 ||
-                bullet.position.x > STAGE_WIDTH / 2 ||
-                bullet.position.y < -STAGE_HEIGHT / 2 ||
-                bullet.position.y > STAGE_HEIGHT / 2
-            ) {
-                this.bullets.splice(i, 1);
+        for (const bullet of this.bullets.values()) {
+            if (this._hitActor(bullet) || this._hitEdge(bullet)) {
+                this.bullets.delete(bullet.id);
                 this.emit(StateEventEnum.ExplosionBorn, bullet.id, bullet.position);
+            } else {
+                bullet.position.x += bullet.direction.x * dt * BULLET_SPEED;
+                bullet.position.y += bullet.direction.y * dt * BULLET_SPEED;
+            }
+        }
+    }
+
+    private _hitActor(bullet: IBullet): boolean {
+        for (const actor of this.actors.values()) {
+            if (actor.id === bullet.owner) {
                 continue;
             }
 
-            bullet.position.x += bullet.direction.x * dt * BULLET_SPEED;
-            bullet.position.y += bullet.direction.y * dt * BULLET_SPEED;
+            if ((bullet.position.x - actor.position.x) ** 2 + (bullet.position.y - actor.position.y - 40) ** 2 < HIT_RADIUS ** 2) {
+                actor.hp -= BULLET_DAMAGE;
+                return true;
+            }
         }
+        return false;
+    }
+
+    private _hitEdge(bullet: IBullet): boolean {
+        return (
+            bullet.position.x < -STAGE_WIDTH / 2 ||
+            bullet.position.x > STAGE_WIDTH / 2 ||
+            bullet.position.y < -STAGE_HEIGHT / 2 ||
+            bullet.position.y > STAGE_HEIGHT / 2
+        );
     }
 
     public load(data: IState) {
         this.actors.clear();
         for (const actor of data.actors) {
-            this.actors.set(actor.id, actor);
+            this.actors.set(actor.id, {
+                ...actor,
+                position: { ...actor.position },
+                direction: { ...actor.direction },
+            });
         }
-        this.bullets = data.bullets.slice();
+        this.bullets.clear();
+        for (const bullet of data.bullets) {
+            this.bullets.set(bullet.id, {
+                ...bullet,
+                position: { ...bullet.position },
+                direction: { ...bullet.direction },
+            });
+        }
         this.nextBulletId = data.nextBulletId;
+        return this;
     }
 
     public dump(): IState {
+        const actors: IActor[] = [];
+        for (const actor of this.actors.values()) {
+            actors.push({
+                ...actor,
+                position: { ...actor.position },
+                direction: { ...actor.direction },
+            });
+        }
+        const bullets: IBullet[] = [];
+        for (const bullet of this.bullets.values()) {
+            bullets.push({
+                ...bullet,
+                position: { ...bullet.position },
+                direction: { ...bullet.direction },
+            });
+        }
         return {
-            actors: Array.from(this.actors.values()),
-            bullets: this.bullets.slice(),
+            actors,
+            bullets,
             nextBulletId: this.nextBulletId,
         };
     }
 
-    private map: Map<StateEventEnum, Array<IItem>> = new Map();
+    public reset() {
+        this.actors.clear();
+        this.bullets.clear();
+        this.nextBulletId = 1;
+    }
 
-    on(event: StateEventEnum, cb: Function, ctx: unknown) {
-        if (this.map.has(event)) {
-            this.map.get(event).push({ cb, ctx });
+    private _map: Map<StateEventEnum, Array<IItem>> = new Map();
+
+    public on(event: StateEventEnum, cb: Function, ctx: unknown) {
+        if (this._map.has(event)) {
+            this._map.get(event).push({ cb, ctx });
         } else {
-            this.map.set(event, [{ cb, ctx }]);
+            this._map.set(event, [{ cb, ctx }]);
         }
     }
 
-    off(event: StateEventEnum, cb: Function, ctx: unknown) {
-        if (this.map.has(event)) {
-            const index = this.map.get(event).findIndex(i => cb === i.cb && i.ctx === ctx);
-            index > -1 && this.map.get(event).splice(index, 1);
+    public off(event: StateEventEnum, cb: Function, ctx: unknown) {
+        if (this._map.has(event)) {
+            const index = this._map.get(event).findIndex(i => cb === i.cb && i.ctx === ctx);
+            index > -1 && this._map.get(event).splice(index, 1);
         }
     }
 
-    emit(event: StateEventEnum, ...params: unknown[]) {
-        if (this.map.has(event)) {
-            this.map.get(event).forEach(({ cb, ctx }) => {
+    public emit(event: StateEventEnum, ...params: unknown[]) {
+        if (this._map.has(event)) {
+            this._map.get(event).forEach(({ cb, ctx }) => {
                 cb.apply(ctx, params);
             });
         }
-    }
-
-    clear() {
-        this.map.clear();
     }
 }

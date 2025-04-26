@@ -137,35 +137,4 @@ myServer.setApi(ApiMsgEnum.ApiRoomLeave, (connection, _data) => {
     return {};
 });
 
-/**
- * 开始游戏
- */
-myServer.setApi(ApiMsgEnum.ApiGameStart, (connection, _data) => {
-    const player = PlayerManager.Instance.getPlayerByConnection(connection.id);
-    if (!player) {
-        throw new Error('未登录');
-    }
-
-    if (!player.roomId) {
-        throw new Error('玩家不在房间内');
-    }
-
-    const room = RoomManager.Instance.getRoom(player.roomId);
-    if (room.owner.id !== player.id) {
-        throw new Error('只有房主可以开始游戏');
-    }
-
-    if (room.players.size < 2) {
-        throw new Error('至少需要两名玩家才能开始游戏');
-    }
-
-    RoomManager.Instance.startRoom(room);
-
-    RoomManager.Instance.syncRooms();
-    RoomManager.Instance.syncRoom(room.id);
-    PlayerManager.Instance.syncPlayers();
-
-    return {};
-});
-
 myServer.start();

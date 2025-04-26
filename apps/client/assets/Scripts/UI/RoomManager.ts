@@ -34,8 +34,7 @@ export class RoomManager extends Component {
         const { success, res, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiRoomJoin, { roomId: this.id });
 
         if (success) {
-            DataManager.Instance.roomInfo = res.room;
-            DataManager.Instance.loadState(res.state);
+            DataManager.Instance.syncRoom(res);
 
             director.loadScene(SceneEnum.Battle);
         } else {

@@ -57,8 +57,10 @@ export class Connection {
         const player = PlayerManager.Instance.getPlayerByConnection(this.id);
         if (player) {
             if (player.roomId) {
+                const roomId = player.roomId;
                 RoomManager.Instance.leaveRoom(player);
                 RoomManager.Instance.syncRooms();
+                RoomManager.Instance.syncRoom(roomId);
             }
 
             PlayerManager.Instance.removePlayer(player);

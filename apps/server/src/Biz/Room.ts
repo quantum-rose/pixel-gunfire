@@ -14,6 +14,8 @@ export class Room {
 
     public players = new Set<Player>();
 
+    private _connectionIdToFrameId = new Map<number, number>();
+
     public maxPlayers: number = 4;
 
     public get isFull() {
@@ -58,6 +60,7 @@ export class Room {
         this.players.add(player);
         player.roomId = this.id;
         this._addActor(player);
+        this._connectionIdToFrameId.set(player.connection.id, 0);
         player.connection.listen(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
     }
 
@@ -65,7 +68,7 @@ export class Room {
         let type: EntityTypeEnum;
         let weaponType: EntityTypeEnum;
         let bulletType: EntityTypeEnum;
-        if (player.id + (this.id % 2) === 0) {
+        if ((player.id + this.id) % 2 === 0) {
             type = EntityTypeEnum.Actor1;
             weaponType = EntityTypeEnum.Weapon1;
             bulletType = EntityTypeEnum.Bullet1;
@@ -96,6 +99,7 @@ export class Room {
         this.players.delete(player);
         player.roomId = null;
         this._removeActor(player);
+        this._connectionIdToFrameId.delete(player.connection.id);
         player.connection.unlisten(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
 
         if (this.owner === player && !this.isEmpty) {
@@ -114,7 +118,7 @@ export class Room {
 
         this._syncTimer = setInterval(() => {
             this._sendServerSync();
-        }, 0);
+        }, 100);
     }
 
     public stop() {
@@ -142,6 +146,7 @@ export class Room {
 
     private _getClientSync(connection: Connection, { input, frameId }: IMsgClientSync) {
         this._pendingInput.push(input);
+        this._connectionIdToFrameId.set(connection.id, frameId);
     }
 
     private _sendServerSync() {
@@ -155,10 +160,11 @@ export class Room {
 
         this.players.forEach(player => {
             player.connection.send(ApiMsgEnum.MsgServerSync, {
-                lastFrameId: 0,
+                lastFrameId: this._connectionIdToFrameId.get(player.connection.id),
                 inputs: this._pendingInput,
             });
         });
+
         this._pendingInput.length = 0;
     }
 }

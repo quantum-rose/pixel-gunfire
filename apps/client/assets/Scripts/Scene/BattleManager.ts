@@ -1,8 +1,8 @@
-import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
-import { ApiMsgEnum, EntityTypeEnum, IClientInput, IMsgServerSync } from '../Common';
+import { _decorator, Component, director, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
+import { ApiMsgEnum, EntityTypeEnum, IClientInput, IMsgClientSync, IMsgRoom, IMsgServerSync } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
-import { EventEnum, PrefabPathEnum, TexturePathEnum } from '../Enum';
+import { EventEnum, PrefabPathEnum, SceneEnum, TexturePathEnum } from '../Enum';
 import DataManager from '../Global/DataManager';
 import EventManager from '../Global/EventManager';
 import { NetworkManager } from '../Global/NetworkManager';
@@ -17,28 +17,47 @@ export class BattleManager extends Component {
 
     private _ui: Node;
 
+    private _pendingMsg: IMsgClientSync[] = [];
+
     private _shouldUpdate: boolean = false;
 
-    protected async start(): Promise<void> {
-        this._clearGame();
-        await Promise.all([this._loadResources(), this._connectServer()]);
-        this._initGame();
-    }
-
-    private _initGame() {
-        NetworkManager.Instance.listen(ApiMsgEnum.MsgServerSync, this._onServerSync, this);
-        EventManager.Instance.on(EventEnum.ClientSync, this._onClientSync, this);
-        DataManager.Instance.jm = this._ui.getComponentInChildren(JoyStickManager);
-        this._initMap();
-        this._shouldUpdate = true;
-    }
-
-    private _clearGame() {
-        NetworkManager.Instance.unlisten(ApiMsgEnum.MsgServerSync, this._onServerSync, this);
-        EventManager.Instance.off(EventEnum.ClientSync, this._onClientSync, this);
-        DataManager.Instance.stage = this._stage = this.node.getChildByName('Stage');
+    protected onLoad(): void {
+        this._stage = this.node.getChildByName('Stage');
         this._stage.destroyAllChildren();
         this._ui = this.node.getChildByName('UI');
+        this._pendingMsg = [];
+        this._shouldUpdate = false;
+
+        DataManager.Instance.stage = this._stage;
+        DataManager.Instance.jm = this._ui.getComponentInChildren(JoyStickManager);
+
+        NetworkManager.Instance.listen(ApiMsgEnum.MsgRoom, this._onRoomSync, this);
+        NetworkManager.Instance.listen(ApiMsgEnum.MsgServerSync, this._onServerSync, this);
+        EventManager.Instance.on(EventEnum.ClientSync, this._onClientSync, this);
+    }
+
+    protected onDestroy(): void {
+        ObjectPoolManager.Instance.clear();
+
+        DataManager.Instance.stage = null;
+        DataManager.Instance.jm = null;
+        DataManager.Instance.state.reset();
+        DataManager.Instance.lastState.reset();
+        DataManager.Instance.actorMap.clear();
+        DataManager.Instance.bulletMap.clear();
+        DataManager.Instance.frameId = 1;
+
+        NetworkManager.Instance.unlisten(ApiMsgEnum.MsgRoom, this._onRoomSync, this);
+        NetworkManager.Instance.unlisten(ApiMsgEnum.MsgServerSync, this._onServerSync, this);
+        EventManager.Instance.off(EventEnum.ClientSync, this._onClientSync, this);
+    }
+
+    protected async start(): Promise<void> {
+        await Promise.all([this._loadResources(), this._connectServer()]);
+
+        this._initMap();
+
+        this._shouldUpdate = true;
     }
 
     private async _loadResources() {
@@ -70,18 +89,37 @@ export class BattleManager extends Component {
         }
     }
 
+    private _onRoomSync(data: IMsgRoom) {
+        DataManager.Instance.syncRoom(data);
+    }
+
     private _onServerSync(data: IMsgServerSync) {
+        DataManager.Instance.state.load(DataManager.Instance.lastState.dump());
+
         for (const input of data.inputs) {
             DataManager.Instance.applyInput(input);
         }
+
+        DataManager.Instance.lastState.load(DataManager.Instance.state.dump());
+
+        this._pendingMsg = this._pendingMsg.reduce((acc, msg) => {
+            if (msg.frameId > data.lastFrameId) {
+                DataManager.Instance.applyInput(msg.input);
+                acc.push(msg);
+            }
+            return acc;
+        }, []);
     }
 
     private _onClientSync(input: IClientInput) {
-        const data = {
+        const data: IMsgClientSync = {
             input,
             frameId: DataManager.Instance.frameId++,
         };
         NetworkManager.Instance.send(ApiMsgEnum.MsgClientSync, data);
+
+        DataManager.Instance.applyInput(input);
+        this._pendingMsg.push(data);
     }
 
     protected update(dt: number): void {
@@ -129,10 +167,17 @@ export class BattleManager extends Component {
             }
             am.render(actor);
         }
+
+        for (const am of DataManager.Instance.actorMap.values()) {
+            if (!DataManager.Instance.state.actors.has(am.id)) {
+                am.node.destroy();
+                DataManager.Instance.actorMap.delete(am.id);
+            }
+        }
     }
 
     private _renderBullets() {
-        for (const bullet of DataManager.Instance.state.bullets) {
+        for (const bullet of DataManager.Instance.state.bullets.values()) {
             let bm = DataManager.Instance.bulletMap.get(bullet.id);
             if (!bm) {
                 const node = ObjectPoolManager.Instance.get(bullet.type);
@@ -162,5 +207,17 @@ export class BattleManager extends Component {
 
         // 缓动镜头位置
         this._stage.setPosition(Vec3.lerp(new Vec3(), this._stage.getPosition(), targetPosition, 0.1));
+    }
+
+    public async handleClickLeave() {
+        const { success, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiRoomLeave, {});
+
+        if (success) {
+            DataManager.Instance.roomInfo = null;
+
+            director.loadScene(SceneEnum.Hall);
+        } else {
+            console.error('Error joining room:', error);
+        }
     }
 }

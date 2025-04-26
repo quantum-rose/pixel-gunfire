@@ -55,7 +55,3 @@ export interface IApiRoomJoinRes {
 export interface IApiRoomLeaveReq {}
 
 export interface IApiRoomLeaveRes {}
-
-export interface IApiGameStartReq {}
-
-export interface IApiGameStartRes {}

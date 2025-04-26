@@ -51,6 +51,7 @@ export class RoomManager extends Singleton {
         room.players.forEach(player => {
             player.connection.send(ApiMsgEnum.MsgRoom, {
                 room: room.dump(),
+                state: room.state.dump(),
             });
         });
     }

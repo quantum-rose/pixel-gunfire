@@ -1,4 +1,4 @@
-import { _decorator } from 'cc';
+import { _decorator, Node, tween, Tween, Vec3 } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
 import { EntityTypeEnum, IBullet, IVec2 } from '../../Common';
 import { EntityStateEnum, EventEnum } from '../../Enum';
@@ -14,8 +14,16 @@ const { ccclass, property } = _decorator;
 export class BulletManager extends EntityManager {
     public id: number;
 
+    private _lastPos: IVec2;
+
+    private _tw: Tween<Node>;
+
     public init(data: IBullet) {
         this.id = data.id;
+        this._lastPos = null;
+        this._tw?.stop();
+        this._tw = null;
+        this.node.active = false;
 
         this.fsm = this.addComponent(BulletStateMachine);
         this.fsm.init(data.type);
@@ -23,6 +31,10 @@ export class BulletManager extends EntityManager {
         this.state = EntityStateEnum.Idle;
 
         EventManager.Instance.on(EventEnum.ExplosionBorn, this._onExplosionBorn, this);
+    }
+
+    protected onDestroy(): void {
+        EventManager.Instance.off(EventEnum.ExplosionBorn, this._onExplosionBorn, this);
     }
 
     private _onExplosionBorn(id: number, position: IVec2) {
@@ -41,7 +53,20 @@ export class BulletManager extends EntityManager {
 
     public render(data: IBullet) {
         const { position, direction } = data;
-        this.node.setPosition(position.x, position.y);
+
+        if (!this._lastPos) {
+            this.node.active = true;
+            this._lastPos = { x: position.x, y: position.y };
+            this.node.setPosition(this._lastPos.x, this._lastPos.y);
+        } else if (this._lastPos.x !== position.x || this._lastPos.y !== position.y) {
+            this._tw?.stop();
+            this.node.setPosition(this._lastPos.x, this._lastPos.y);
+            this._lastPos = { x: position.x, y: position.y };
+
+            this._tw = tween(this.node)
+                .to(0.1, { position: new Vec3(position.x, position.y) })
+                .start();
+        }
 
         const rotation = radianToAngle(Math.atan2(direction.y, direction.x));
         this.node.setRotationFromEuler(0, 0, rotation);

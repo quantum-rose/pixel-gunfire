@@ -105,8 +105,7 @@ export class HallManager extends Component {
         const { success, res, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiRoomCreate, { name: '' });
 
         if (success) {
-            DataManager.Instance.roomInfo = res.room;
-            DataManager.Instance.loadState(res.state);
+            DataManager.Instance.syncRoom(res);
 
             director.loadScene(SceneEnum.Battle);
         } else {

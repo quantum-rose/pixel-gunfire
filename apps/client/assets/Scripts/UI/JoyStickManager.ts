@@ -1,9 +1,11 @@
-import { _decorator, Component, EventTouch, input, Input, Node, UITransform, Vec2 } from 'cc';
+import { _decorator, Component, EventKeyboard, EventTouch, input, Input, KeyCode, Node, sys, UITransform, Vec2 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('JoyStickManager')
 export class JoyStickManager extends Component {
     public input: Vec2 = new Vec2(0, 0);
+
+    private _keys: Set<KeyCode> = new Set();
 
     private _body: Node;
 
@@ -22,15 +24,47 @@ export class JoyStickManager extends Component {
         this._defaultPos = new Vec2(this._body.position.x, this._body.position.y);
         this._radius = this._body.getComponent(UITransform).width / 2;
 
-        input.on(Input.EventType.TOUCH_START, this._onTouchStart, this);
-        input.on(Input.EventType.TOUCH_MOVE, this._onTouchMove, this);
-        input.on(Input.EventType.TOUCH_END, this._onTouchEnd, this);
+        if (sys.isMobile) {
+            input.on(Input.EventType.TOUCH_START, this._onTouchStart, this);
+            input.on(Input.EventType.TOUCH_MOVE, this._onTouchMove, this);
+            input.on(Input.EventType.TOUCH_END, this._onTouchEnd, this);
+        } else {
+            input.on(Input.EventType.KEY_DOWN, this._onKeyDown, this);
+            input.on(Input.EventType.KEY_UP, this._onKeyUp, this);
+        }
     }
 
     protected onDestroy(): void {
-        input.off(Input.EventType.TOUCH_START, this._onTouchStart, this);
-        input.off(Input.EventType.TOUCH_MOVE, this._onTouchMove, this);
-        input.off(Input.EventType.TOUCH_END, this._onTouchEnd, this);
+        if (sys.isMobile) {
+            input.off(Input.EventType.TOUCH_START, this._onTouchStart, this);
+            input.off(Input.EventType.TOUCH_MOVE, this._onTouchMove, this);
+            input.off(Input.EventType.TOUCH_END, this._onTouchEnd, this);
+        } else {
+            input.off(Input.EventType.KEY_DOWN, this._onKeyDown, this);
+            input.off(Input.EventType.KEY_UP, this._onKeyUp, this);
+        }
+    }
+
+    private _onKeyDown(event: EventKeyboard): void {
+        this._keys.add(event.keyCode);
+        this._updateInputFromKeys();
+    }
+
+    private _onKeyUp(event: EventKeyboard): void {
+        this._keys.delete(event.keyCode);
+        this._updateInputFromKeys();
+    }
+
+    private _updateInputFromKeys(): void {
+        let x = 0;
+        let y = 0;
+
+        if (this._keys.has(KeyCode.KEY_W)) y += 1;
+        if (this._keys.has(KeyCode.KEY_S)) y -= 1;
+        if (this._keys.has(KeyCode.KEY_A)) x -= 1;
+        if (this._keys.has(KeyCode.KEY_D)) x += 1;
+
+        this.input = new Vec2(x, y).normalize();
     }
 
     private _onTouchStart(event: EventTouch): void {

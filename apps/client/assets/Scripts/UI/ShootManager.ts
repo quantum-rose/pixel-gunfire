@@ -1,4 +1,4 @@
-import { _decorator, Color, Component, EventTouch, Input, input, Node, Sprite, UITransform, Vec2 } from 'cc';
+import { _decorator, Color, Component, EventTouch, Input, input, Node, Sprite, sys, UITransform, Vec2 } from 'cc';
 import { EventEnum } from '../Enum';
 import EventManager from '../Global/EventManager';
 const { ccclass, property } = _decorator;
@@ -31,7 +31,7 @@ export class ShootManager extends Component {
         }
 
         const touchPos = event.getUILocation();
-        if (touchPos.x < this.node.parent.getComponent(UITransform).width / 2) {
+        if (sys.isMobile && touchPos.x < this.node.parent.getComponent(UITransform).width / 2) {
             return;
         }
 

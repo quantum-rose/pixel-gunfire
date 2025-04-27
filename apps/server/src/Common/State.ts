@@ -1,6 +1,7 @@
 import { ACTOR_SPEED, BULLET_DAMAGE, BULLET_SPEED, HIT_RADIUS, STAGE_HEIGHT, STAGE_WIDTH } from './Constants';
 import { EntityTypeEnum, InputTypeEnum, StateEventEnum } from './Enum';
 import { toFixed } from './Util';
+import { Vector2 } from './Vector2';
 
 export interface IVec2 {
     x: number;
@@ -17,6 +18,7 @@ export interface IActor {
     hp: number;
     nickname: string;
     damage: number;
+    rebirthTime: number;
 }
 
 export interface IBullet {
@@ -143,6 +145,23 @@ export class State {
 
     private _applyTimePast(input: ITimePast) {
         const { dt } = input;
+
+        for (const actor of this.actors.values()) {
+            if (actor.rebirthTime > 0) {
+                actor.rebirthTime -= dt;
+            } else if (actor.hp <= 0) {
+                actor.hp = 100;
+                actor.rebirthTime = 0;
+
+                const direction = new Vector2(1, 0).rotate(this._randomBySeed() * 2 * Math.PI).normalize();
+                const position = direction.clone().scale((this._randomBySeed() + 1) * 480);
+                actor.position.x = toFixed(position.x);
+                actor.position.y = toFixed(position.y);
+                actor.direction.x = -direction.x;
+                actor.direction.y = -direction.y;
+            }
+        }
+
         for (const bullet of this.bullets.values()) {
             if (this._hitActor(bullet) || this._hitEdge(bullet)) {
                 this.bullets.delete(bullet.id);
@@ -156,15 +175,20 @@ export class State {
 
     private _hitActor(bullet: IBullet): boolean {
         for (const actor of this.actors.values()) {
-            if (actor.id === bullet.owner) {
+            if (actor.id === bullet.owner || actor.hp <= 0) {
                 continue;
             }
 
             if ((bullet.position.x - actor.position.x) ** 2 + (bullet.position.y - actor.position.y - 40) ** 2 < HIT_RADIUS ** 2) {
-                this.seed = this._randomBySeed(this.seed);
-                const crit = this.seed / 233280 < 0.25;
+                const crit = this._randomBySeed() < 0.25;
                 const damage = crit ? BULLET_DAMAGE * 2 : BULLET_DAMAGE;
                 actor.hp -= damage;
+
+                if (actor.hp <= 0) {
+                    actor.hp = 0;
+                    actor.rebirthTime = 5;
+                }
+
                 this.emit(StateEventEnum.DamageBorn, actor.id, damage, crit);
 
                 const bulletOwner = this.actors.get(bullet.owner);
@@ -187,9 +211,9 @@ export class State {
         );
     }
 
-    private _randomBySeed(seed: number) {
-        console.log(seed);
-        return (seed * 9301 + 49297) % 233280;
+    private _randomBySeed() {
+        this.seed = (this.seed * 9301 + 49297) % 233280;
+        return this.seed / 233280;
     }
 
     public load(data: IState) {

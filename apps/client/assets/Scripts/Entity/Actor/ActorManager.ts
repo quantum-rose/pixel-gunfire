@@ -82,6 +82,16 @@ export class ActorManager extends EntityManager {
     }
 
     public render(data: IActor) {
+        if (data.hp <= 0) {
+            this.node.active = false;
+            this._info.active = false;
+            this._lastPos = null;
+            this._tw?.stop();
+            return;
+        }
+        this.node.active = true;
+        this._info.active = true;
+
         const { position, direction } = data;
 
         if (!this._lastPos) {
@@ -113,6 +123,11 @@ export class ActorManager extends EntityManager {
 
     public tick(dt: number): void {
         if (!DataManager.Instance.isMe(this.id)) {
+            return;
+        }
+
+        const myActor = DataManager.Instance.state.actors.get(this.id);
+        if (myActor.hp <= 0) {
             return;
         }
 

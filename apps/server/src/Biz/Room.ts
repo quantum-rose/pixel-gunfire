@@ -1,6 +1,6 @@
 import { ApiMsgEnum, EntityTypeEnum, IActor, IClientInput, IMsgClientSync, InputTypeEnum, IPlayer, IRoom, State, toFixed } from '../Common';
+import { Vector2 } from '../Common/Vector2';
 import type { Connection } from '../Core';
-import { Vector2 } from '../Utils/Vector2';
 import { Player } from './Player';
 
 export class Room {
@@ -79,7 +79,7 @@ export class Room {
         }
 
         const direction = new Vector2(1, 0).rotate(Math.random() * 2 * Math.PI).normalize();
-        const position = direction.clone().scale((Math.random() + 1) * 320);
+        const position = direction.clone().scale((Math.random() + 1) * 480);
 
         const actor: IActor = {
             type,
@@ -91,6 +91,7 @@ export class Room {
             hp: 100,
             nickname: player.nickname,
             damage: 0,
+            rebirthTime: 0,
         };
 
         this.state.addActor(actor);

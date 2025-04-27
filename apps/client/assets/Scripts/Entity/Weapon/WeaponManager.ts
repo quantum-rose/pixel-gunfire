@@ -40,6 +40,11 @@ export class WeaponManager extends EntityManager {
             return;
         }
 
+        const myActor = DataManager.Instance.state.actors.get(this._owner);
+        if (myActor.hp <= 0) {
+            return;
+        }
+
         const pointWorldPos = this._point.getWorldPosition();
         const pointStagePos = DataManager.Instance.stage.getComponent(UITransform).convertToNodeSpaceAR(pointWorldPos);
         const anchorWorldPos = this._anchor.getWorldPosition();

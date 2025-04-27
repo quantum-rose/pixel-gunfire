@@ -193,23 +193,30 @@ export class BattleManager extends Component {
     }
 
     private _renderStage() {
-        const myPlayer = DataManager.Instance.state.actors.get(DataManager.Instance.playerInfo.id);
-        if (!myPlayer) {
+        const myActor = DataManager.Instance.state.actors.get(DataManager.Instance.playerInfo.id);
+        if (!myActor) {
             return;
         }
 
-        const targetPosition = new Vec3(-myPlayer.position.x, -myPlayer.position.y);
+        if (myActor.hp <= 0) {
+            this.stage.setScale(Vec3.lerp(new Vec3(), this.stage.getScale(), new Vec3(0.333333, 0.333333, 1), 0.1));
+            this.stage.setPosition(Vec3.lerp(new Vec3(), this.stage.getPosition(), new Vec3(0, 0), 0.07));
+        } else {
+            this.stage.setScale(Vec3.lerp(new Vec3(), this.stage.getScale(), new Vec3(1, 1, 1), 0.1));
 
-        if (DataManager.Instance.jm.input) {
-            // 虚拟摇杆有输入
-            const input = DataManager.Instance.jm.input;
-            const leadFactor = 160; // 视野前方的偏移量
-            targetPosition.x -= input.x * leadFactor;
-            targetPosition.y -= input.y * leadFactor;
+            const targetPosition = new Vec3(-myActor.position.x, -myActor.position.y);
+
+            if (DataManager.Instance.jm.input) {
+                // 虚拟摇杆有输入
+                const input = DataManager.Instance.jm.input;
+                const leadFactor = 160; // 视野前方的偏移量
+                targetPosition.x -= input.x * leadFactor;
+                targetPosition.y -= input.y * leadFactor;
+            }
+
+            // 缓动镜头位置
+            this.stage.setPosition(Vec3.lerp(new Vec3(), this.stage.getPosition(), targetPosition, 0.07));
         }
-
-        // 缓动镜头位置
-        this.stage.setPosition(Vec3.lerp(new Vec3(), this.stage.getPosition(), targetPosition, 0.07));
     }
 
     private _renderRank() {

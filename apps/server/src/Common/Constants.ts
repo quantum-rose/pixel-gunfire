@@ -1,22 +1,22 @@
 /**
  * 舞台宽度
  */
-export const STAGE_WIDTH = 1920;
+export const STAGE_WIDTH = 2880;
 
 /**
  * 舞台高度
  */
-export const STAGE_HEIGHT = 1280;
+export const STAGE_HEIGHT = 1920;
 
 /**
  * 角色移动速度
  */
-export const ACTOR_SPEED = 100;
+export const ACTOR_SPEED = 200;
 
 /**
  * 子弹移动速度
  */
-export const BULLET_SPEED = 600;
+export const BULLET_SPEED = 1000;
 
 /**
  * 命中半径

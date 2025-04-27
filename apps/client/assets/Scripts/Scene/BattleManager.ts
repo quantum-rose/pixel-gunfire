@@ -200,7 +200,7 @@ export class BattleManager extends Component {
         }
 
         // 缓动镜头位置
-        this._stage.setPosition(Vec3.lerp(new Vec3(), this._stage.getPosition(), targetPosition, 0.1));
+        this._stage.setPosition(Vec3.lerp(new Vec3(), this._stage.getPosition(), targetPosition, 0.07));
     }
 
     public async handleClickLeave() {

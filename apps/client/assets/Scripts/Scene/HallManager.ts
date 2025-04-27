@@ -3,8 +3,8 @@ import { ApiMsgEnum, IMsgPlayerList, IMsgRoomList, IPlayer, IRoom } from '../Com
 import { SceneEnum } from '../Enum';
 import DataManager from '../Global/DataManager';
 import { NetworkManager } from '../Global/NetworkManager';
-import { PlayerManager } from '../UI/PlayerManager';
-import { RoomManager } from '../UI/RoomManager';
+import { PlayerItemManager } from '../UI/PlayerItemManager';
+import { RoomItemManager } from '../UI/RoomItemManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('HallManager')
@@ -67,7 +67,7 @@ export class HallManager extends Component {
         }
 
         for (let i = 0; i < list.length; i++) {
-            this.playerContainer.children[i].getComponent(PlayerManager).init(list[i]);
+            this.playerContainer.children[i].getComponent(PlayerItemManager).init(list[i]);
         }
     }
 
@@ -97,7 +97,7 @@ export class HallManager extends Component {
         }
 
         for (let i = 0; i < list.length; i++) {
-            this.roomContainer.children[i].getComponent(RoomManager).init(list[i]);
+            this.roomContainer.children[i].getComponent(RoomItemManager).init(list[i]);
         }
     }
 

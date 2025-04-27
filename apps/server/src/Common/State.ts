@@ -16,6 +16,7 @@ export interface IActor {
     direction: IVec2;
     hp: number;
     nickname: string;
+    damage: number;
 }
 
 export interface IBullet {
@@ -165,6 +166,12 @@ export class State {
                 const damage = crit ? BULLET_DAMAGE * 2 : BULLET_DAMAGE;
                 actor.hp -= damage;
                 this.emit(StateEventEnum.DamageBorn, actor.id, damage, crit);
+
+                const bulletOwner = this.actors.get(bullet.owner);
+                if (bulletOwner) {
+                    bulletOwner.damage += damage;
+                }
+
                 return true;
             }
         }

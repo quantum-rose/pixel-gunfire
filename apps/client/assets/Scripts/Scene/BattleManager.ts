@@ -9,29 +9,36 @@ import { NetworkManager } from '../Global/NetworkManager';
 import { ObjectPoolManager } from '../Global/ObjectPoolManager';
 import { ResourceManager } from '../Global/ResourceManager';
 import { JoyStickManager } from '../UI/JoyStickManager';
+import { RankItemManager } from '../UI/RankItemManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('BattleManager')
 export class BattleManager extends Component {
-    private _stage: Node;
+    @property(Node)
+    public stage: Node;
 
-    private _actorLayer: Node;
+    @property(Node)
+    public actorLayer: Node;
 
-    private _ui: Node;
+    @property(Node)
+    public joyStick: Node;
+
+    @property(Node)
+    public rank: Node;
+
+    @property(Prefab)
+    public rankItemPrefab: Prefab;
 
     private _pendingMsg: IMsgClientSync[] = [];
 
     private _shouldUpdate: boolean = false;
 
     protected onLoad(): void {
-        this._stage = this.node.getChildByName('Stage');
-        this._actorLayer = this._stage.getChildByName('ActorLayer');
-        this._ui = this.node.getChildByName('UI');
         this._pendingMsg = [];
         this._shouldUpdate = false;
 
-        DataManager.Instance.stage = this._stage;
-        DataManager.Instance.jm = this._ui.getComponentInChildren(JoyStickManager);
+        DataManager.Instance.stage = this.stage;
+        DataManager.Instance.jm = this.joyStick.getComponent(JoyStickManager);
 
         NetworkManager.Instance.listen(ApiMsgEnum.MsgRoom, this._onRoomSync, this);
         NetworkManager.Instance.listen(ApiMsgEnum.MsgServerSync, this._onServerSync, this);
@@ -46,6 +53,7 @@ export class BattleManager extends Component {
         DataManager.Instance.state.reset();
         DataManager.Instance.lastState.reset();
         DataManager.Instance.actorMap.clear();
+        DataManager.Instance.rankMap.clear();
         DataManager.Instance.bulletMap.clear();
         DataManager.Instance.frameId = 1;
 
@@ -139,6 +147,7 @@ export class BattleManager extends Component {
         this._renderActors();
         this._renderBullets();
         this._renderStage();
+        this._renderRank();
     }
 
     private _tickActors(dt: number) {
@@ -154,7 +163,7 @@ export class BattleManager extends Component {
             if (!am) {
                 const prefab = DataManager.Instance.prefabMap.get(actor.type);
                 const node = instantiate(prefab);
-                node.setParent(this._actorLayer);
+                node.setParent(this.actorLayer);
                 am = node.getComponent(ActorManager);
                 DataManager.Instance.actorMap.set(actor.id, am);
                 am.init(actor);
@@ -200,7 +209,31 @@ export class BattleManager extends Component {
         }
 
         // 缓动镜头位置
-        this._stage.setPosition(Vec3.lerp(new Vec3(), this._stage.getPosition(), targetPosition, 0.07));
+        this.stage.setPosition(Vec3.lerp(new Vec3(), this.stage.getPosition(), targetPosition, 0.07));
+    }
+
+    private _renderRank() {
+        const actors = Array.from(DataManager.Instance.state.actors.values()).sort((a, b) => b.damage - a.damage);
+
+        for (let i = 0; i < actors.length; i++) {
+            const actor = actors[i];
+            let rm = DataManager.Instance.rankMap.get(actor.id);
+            if (!rm) {
+                const rankItemNode = instantiate(this.rankItemPrefab);
+                rankItemNode.setParent(this.rank);
+                rm = rankItemNode.getComponent(RankItemManager);
+                DataManager.Instance.rankMap.set(actor.id, rm);
+                rm.init(actor.id, i);
+            }
+            rm.render(actor, i);
+        }
+
+        for (const rm of DataManager.Instance.rankMap.values()) {
+            if (!DataManager.Instance.state.actors.has(rm.id)) {
+                rm.node.destroy();
+                DataManager.Instance.rankMap.delete(rm.id);
+            }
+        }
     }
 
     public async handleClickLeave() {

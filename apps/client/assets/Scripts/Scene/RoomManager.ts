@@ -2,7 +2,7 @@ import { _decorator, Button, Component, instantiate, Label, Node, Prefab, UIOpac
 import { ApiMsgEnum, IMsgRoom, IPlayer } from '../Common';
 import DataManager from '../Global/DataManager';
 import { NetworkManager } from '../Global/NetworkManager';
-import { PlayerManager } from '../UI/PlayerManager';
+import { PlayerItemManager } from '../UI/PlayerItemManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('RoomManager')
@@ -58,7 +58,7 @@ export class RoomManager extends Component {
         }
 
         for (let i = 0; i < list.length; i++) {
-            this.playerContainer.children[i].getComponent(PlayerManager).init(list[i]);
+            this.playerContainer.children[i].getComponent(PlayerItemManager).init(list[i]);
         }
     }
 

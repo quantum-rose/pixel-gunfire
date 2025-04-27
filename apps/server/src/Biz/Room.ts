@@ -90,6 +90,7 @@ export class Room {
             direction: { x: -direction.x, y: -direction.y },
             hp: 100,
             nickname: player.nickname,
+            damage: 0,
         };
 
         this.state.addActor(actor);

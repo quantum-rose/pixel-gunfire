@@ -5,8 +5,8 @@ import DataManager from '../Global/DataManager';
 import { NetworkManager } from '../Global/NetworkManager';
 const { ccclass, property } = _decorator;
 
-@ccclass('RoomManager')
-export class RoomManager extends Component {
+@ccclass('RoomItemManager')
+export class RoomItemManager extends Component {
     @property(Label)
     public nameLabel: Label;
 

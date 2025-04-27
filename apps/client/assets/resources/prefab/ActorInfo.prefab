@@ -470,8 +470,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 55.34129483934859,
-      "height": 19.12
+      "width": 72.4765625,
+      "height": 24.16
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -509,10 +509,10 @@
     "_string": "nickname",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 15.975000000000001,
-    "_fontSize": 12,
+    "_actualFontSize": 16,
+    "_fontSize": 16,
     "_fontFamily": "Arial",
-    "_lineHeight": 12,
+    "_lineHeight": 16,
     "_overflow": 0,
     "_enableWrapText": true,
     "_font": null,

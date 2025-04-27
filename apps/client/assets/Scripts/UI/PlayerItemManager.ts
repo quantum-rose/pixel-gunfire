@@ -3,8 +3,8 @@ import { IPlayer } from '../Common';
 import DataManager from '../Global/DataManager';
 const { ccclass, property } = _decorator;
 
-@ccclass('PlayerManager')
-export class PlayerManager extends Component {
+@ccclass('PlayerItemManager')
+export class PlayerItemManager extends Component {
     @property(Label)
     public nameLabel: Label;
 

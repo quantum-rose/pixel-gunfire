@@ -5,6 +5,7 @@ import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum } from '../Enum';
 import { JoyStickManager } from '../UI/JoyStickManager';
+import { RankItemManager } from '../UI/RankItemManager';
 import EventManager from './EventManager';
 
 export default class DataManager extends Singleton {
@@ -21,6 +22,8 @@ export default class DataManager extends Singleton {
     public textureMap = new Map<string, SpriteFrame[]>();
 
     public actorMap = new Map<number, ActorManager>();
+
+    public rankMap = new Map<number, RankItemManager>();
 
     public bulletMap = new Map<number, BulletManager>();
 

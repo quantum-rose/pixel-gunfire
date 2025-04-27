@@ -30,6 +30,7 @@ export interface IState {
     actors: IActor[];
     bullets: IBullet[];
     nextBulletId: number;
+    seed: number;
 }
 
 export interface IActorMove {
@@ -64,6 +65,8 @@ export class State {
     public bullets = new Map<number, IBullet>();
 
     public nextBulletId = 1;
+
+    public seed = Date.now() % 233280;
 
     public addActor(actor: IActor) {
         this.actors.set(actor.id, actor);
@@ -157,7 +160,11 @@ export class State {
             }
 
             if ((bullet.position.x - actor.position.x) ** 2 + (bullet.position.y - actor.position.y - 40) ** 2 < HIT_RADIUS ** 2) {
-                actor.hp -= BULLET_DAMAGE;
+                this.seed = this._randomBySeed(this.seed);
+                const crit = this.seed / 233280 < 0.25;
+                const damage = crit ? BULLET_DAMAGE * 2 : BULLET_DAMAGE;
+                actor.hp -= damage;
+                this.emit(StateEventEnum.DamageBorn, actor.id, damage, crit);
                 return true;
             }
         }
@@ -171,6 +178,11 @@ export class State {
             bullet.position.y < -STAGE_HEIGHT / 2 ||
             bullet.position.y > STAGE_HEIGHT / 2
         );
+    }
+
+    private _randomBySeed(seed: number) {
+        console.log(seed);
+        return (seed * 9301 + 49297) % 233280;
     }
 
     public load(data: IState) {
@@ -191,6 +203,7 @@ export class State {
             });
         }
         this.nextBulletId = data.nextBulletId;
+        this.seed = data.seed;
         return this;
     }
 
@@ -215,6 +228,7 @@ export class State {
             actors,
             bullets,
             nextBulletId: this.nextBulletId,
+            seed: this.seed,
         };
     }
 

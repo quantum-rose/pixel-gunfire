@@ -151,6 +151,10 @@
       "__uuid__": "ea6f5c0f-8044-4d3a-813b-e85dc6c86ac2",
       "__expectedType__": "cc.Prefab"
     },
+    "damagePrefab": {
+      "__uuid__": "1ae9693a-de19-4277-9dcb-b3eaf2a2843e",
+      "__expectedType__": "cc.Prefab"
+    },
     "_id": ""
   },
   {

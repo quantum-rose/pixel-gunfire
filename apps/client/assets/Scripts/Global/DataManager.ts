@@ -38,6 +38,7 @@ export default class DataManager extends Singleton {
         super();
 
         this.state.on(StateEventEnum.ExplosionBorn, this._onExplosionBorn, this);
+        this.state.on(StateEventEnum.DamageBorn, this._onDamageBorn, this);
     }
 
     public isMe(id: number) {
@@ -56,6 +57,10 @@ export default class DataManager extends Singleton {
 
     private _onExplosionBorn(bulletId: number, position: IVec2) {
         EventManager.Instance.emit(EventEnum.ExplosionBorn, bulletId, position);
+    }
+
+    private _onDamageBorn(actorId: number, damage: number, crit: boolean) {
+        EventManager.Instance.emit(EventEnum.DamageBorn, actorId, damage, crit);
     }
 }
 

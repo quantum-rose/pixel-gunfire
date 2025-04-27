@@ -13,6 +13,7 @@ export enum EntityTypeEnum {
     Bullet1 = 'Bullet1',
     Bullet2 = 'Bullet2',
     Explosion = 'Explosion',
+    Damage = 'Damage',
 }
 
 export enum ApiMsgEnum {
@@ -35,4 +36,8 @@ export enum StateEventEnum {
      * 子弹命中目标后爆炸
      */
     ExplosionBorn = 'ExplosionBorn',
+    /**
+     * 子弹命中目标后造成伤害
+     */
+    DamageBorn = 'DamageBorn',
 }

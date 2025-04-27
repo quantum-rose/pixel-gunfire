@@ -1,4 +1,4 @@
-import { _decorator, Color, instantiate, Label, Node, Prefab, ProgressBar, Sprite, Tween, tween, Vec3 } from 'cc';
+import { _decorator, Animation, Color, instantiate, Label, Node, Prefab, ProgressBar, Sprite, Tween, tween, Vec3 } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
 import { IActor, InputTypeEnum, IVec2, toFixed } from '../../Common';
 import { EntityStateEnum, EventEnum } from '../../Enum';
@@ -15,6 +15,9 @@ export class ActorManager extends EntityManager {
 
     @property(Prefab)
     public infoPrefab: Prefab;
+
+    @property(Prefab)
+    public damagePrefab: Prefab;
 
     private _infoLayer: Node;
 
@@ -63,6 +66,8 @@ export class ActorManager extends EntityManager {
         this._lastPos = null;
         this._tw?.stop();
         this._tw = null;
+
+        EventManager.Instance.on(EventEnum.DamageBorn, this._onDamageBorn, this);
     }
 
     protected onDestroy(): void {
@@ -72,6 +77,8 @@ export class ActorManager extends EntityManager {
         this._info = null;
         this._hp = null;
         this._nickname = null;
+
+        EventManager.Instance.off(EventEnum.DamageBorn, this._onDamageBorn, this);
     }
 
     public render(data: IActor) {
@@ -118,5 +125,22 @@ export class ActorManager extends EntityManager {
                 dt: toFixed(dt),
             });
         }
+    }
+
+    private _onDamageBorn(actorId: number, damage: number, crit: boolean) {
+        if (this.id !== actorId) {
+            return;
+        }
+
+        const node = instantiate(this.damagePrefab);
+        node.setParent(this._infoLayer);
+        node.setPosition(this.node.position.x + 40 * (Math.random() - 0.5), this.node.position.y);
+        const label = node.getComponentInChildren(Label);
+        label.string = crit ? `暴击 ${damage}` : `${damage}`;
+        label.color = crit ? new Color(255, 0, 0, 255) : new Color(255, 128, 128, 255);
+
+        node.getComponentInChildren(Animation).on(Animation.EventType.FINISHED, () => {
+            node.destroy();
+        });
     }
 }

@@ -1,9 +1,11 @@
-import { _decorator, Component, director, EditBox, Label } from 'cc';
+import { _decorator, Component, director, EditBox, Label, sys } from 'cc';
 import { ApiMsgEnum } from '../Common';
 import { SceneEnum } from '../Enum';
 import DataManager from '../Global/DataManager';
 import { NetworkManager } from '../Global/NetworkManager';
 const { ccclass, property } = _decorator;
+
+const LOCAL_STORAGE_KEY = 'nickname';
 
 @ccclass('LoginManager')
 export class LoginManager extends Component {
@@ -15,6 +17,11 @@ export class LoginManager extends Component {
         this._input = this.node.getChildByName('Input').getComponent(EditBox);
         this._errorMessage = this.node.getChildByName('ErrorMessage').getComponent(Label);
         this._errorMessage.string = '';
+
+        const savedNickname = sys.localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (savedNickname) {
+            this._input.string = savedNickname;
+        }
 
         director.preloadScene(SceneEnum.Hall);
         director.preloadScene(SceneEnum.Room);
@@ -38,6 +45,8 @@ export class LoginManager extends Component {
         const { success, res, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiPlayerJoin, { nickname });
 
         if (success) {
+            sys.localStorage.setItem(LOCAL_STORAGE_KEY, nickname);
+
             this._errorMessage.string = '';
             DataManager.Instance.playerInfo = res.player;
 

@@ -36,6 +36,9 @@ export class RoomManager extends Singleton {
     public syncRooms() {
         const roomList = this.dumpAllRooms();
         PlayerManager.Instance.getAllPlayers().forEach(player => {
+            if (player.isBot) {
+                return;
+            }
             player.connection.send(ApiMsgEnum.MsgRoomList, {
                 list: roomList,
             });
@@ -49,6 +52,9 @@ export class RoomManager extends Singleton {
         }
 
         room.players.forEach(player => {
+            if (player.isBot) {
+                return;
+            }
             player.connection.send(ApiMsgEnum.MsgRoom, {
                 room: room.dump(),
                 state: room.state.dump(),
@@ -79,7 +85,7 @@ export class RoomManager extends Singleton {
     public joinRoom(player: Player, room: Room) {
         this.leaveRoom(player);
 
-        room.addPlayer(player);
+        player.isBot ? room.addBot(player) : room.addPlayer(player);
 
         console.log(`Player joined room: ${player.id}, ${player.nickname}, Room: ${room.id}, ${room.name}`);
     }
@@ -90,7 +96,7 @@ export class RoomManager extends Singleton {
         }
 
         const room = this._id2Room.get(player.roomId);
-        room.removePlayer(player);
+        player.isBot ? room.removeBot(player) : room.removePlayer(player);
 
         console.log(`Player left room: ${player.id}, ${player.nickname}, Room: ${room.id}, ${room.name}`);
 

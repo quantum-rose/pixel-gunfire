@@ -27,12 +27,24 @@ export class PlayerManager extends Singleton {
         return player;
     }
 
+    public createBot(nickName: string) {
+        const bot = new Player(nickName);
+        this._id2Player.set(bot.id, bot);
+        this._nickname2Player.set(bot.nickname, bot);
+        return bot;
+    }
+
     public removePlayer(player: Player) {
         this._id2Player.delete(player.id);
         this._nickname2Player.delete(player.nickname);
         this._connection2Player.delete(player.connection.id);
 
         console.log(`Player left: ${player.id}, ${player.nickname}, Remaining: ${this._id2Player.size}`);
+    }
+
+    public removeBot(bot: Player) {
+        this._id2Player.delete(bot.id);
+        this._nickname2Player.delete(bot.nickname);
     }
 
     public removePlayerByConnection(connectionId: number) {
@@ -45,6 +57,9 @@ export class PlayerManager extends Singleton {
     public syncPlayers() {
         const playerList = this.dumpAllPlayers();
         this._id2Player.forEach(player => {
+            if (player.isBot) {
+                return;
+            }
             player.connection.send(ApiMsgEnum.MsgPlayerList, {
                 list: playerList,
             });

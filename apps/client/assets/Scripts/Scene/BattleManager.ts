@@ -1,5 +1,5 @@
 import { _decorator, Component, director, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
-import { ApiMsgEnum, IClientInput, IMsgClientSync, IMsgRoom, IMsgServerSync } from '../Common';
+import { ApiMsgEnum, IClientInput, IMsgClientSync, IMsgRoom, IMsgServerSync, InputTypeEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum, PrefabPathEnum, SceneEnum, TexturePathEnum } from '../Enum';
@@ -126,8 +126,10 @@ export class BattleManager extends Component {
         };
         NetworkManager.Instance.send(ApiMsgEnum.MsgClientSync, data);
 
-        DataManager.Instance.applyInput(input);
-        this._pendingMsg.push(data);
+        if (input.type === InputTypeEnum.ActorMove) {
+            DataManager.Instance.applyInput(input);
+            this._pendingMsg.push(data);
+        }
     }
 
     protected update(dt: number): void {

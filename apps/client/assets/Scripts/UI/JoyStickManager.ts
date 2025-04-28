@@ -36,20 +36,20 @@ export class JoyStickManager extends Component {
 
     protected onEnable(): void {
         if (sys.isBrowser) {
-            window.addEventListener('blur', this._onWindowBlur.bind(this));
+            window.addEventListener('blur', this._onWindowBlur);
         }
     }
 
     protected onDisable(): void {
         if (sys.isBrowser) {
-            window.removeEventListener('blur', this._onWindowBlur.bind(this));
+            window.removeEventListener('blur', this._onWindowBlur);
         }
     }
 
-    private _onWindowBlur(): void {
+    private _onWindowBlur = (): void => {
         this._keys.clear();
         this._updateInputFromKeys();
-    }
+    };
 
     protected onDestroy(): void {
         if (sys.isMobile) {
@@ -130,6 +130,4 @@ export class JoyStickManager extends Component {
 
         this.input = new Vec2(0, 0);
     }
-
-    public tick(dt: number) {}
 }

@@ -120,7 +120,7 @@ export class Room {
 
         this._syncTimer = setInterval(() => {
             this._sendServerSync();
-        }, 100);
+        }, 50);
     }
 
     public stop() {

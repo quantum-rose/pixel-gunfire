@@ -189,7 +189,7 @@ export class State {
                     actor.rebirthTime = 5;
                 }
 
-                this.emit(StateEventEnum.DamageBorn, actor.id, damage, crit);
+                this.emit(StateEventEnum.DamageBorn, actor.id, bullet.owner, damage, crit);
 
                 const bulletOwner = this.actors.get(bullet.owner);
                 if (bulletOwner) {

@@ -62,8 +62,8 @@ export default class DataManager extends Singleton {
         EventManager.Instance.emit(EventEnum.ExplosionBorn, bulletId, position);
     }
 
-    private _onDamageBorn(actorId: number, damage: number, crit: boolean) {
-        EventManager.Instance.emit(EventEnum.DamageBorn, actorId, damage, crit);
+    private _onDamageBorn(actorId: number, bulletOwner: number, damage: number, crit: boolean) {
+        EventManager.Instance.emit(EventEnum.DamageBorn, actorId, bulletOwner, damage, crit);
     }
 }
 

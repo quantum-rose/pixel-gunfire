@@ -6,6 +6,7 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "yarn workspace @game/server run dev"
+    "dev": "yarn workspace @game/server run dev",
+    "build": "yarn workspace @game/server run build"
   }
 }

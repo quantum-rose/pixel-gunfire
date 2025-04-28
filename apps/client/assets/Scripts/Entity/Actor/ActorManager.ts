@@ -83,6 +83,7 @@ export class ActorManager extends EntityManager {
 
     public render(data: IActor) {
         if (data.hp <= 0) {
+            this.state = EntityStateEnum.Idle;
             this.node.active = false;
             this._hp.active = false;
             this._nickname.active = false;

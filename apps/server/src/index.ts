@@ -2,6 +2,7 @@ import { PlayerManager } from './Biz/PlayerManager';
 import { RoomManager } from './Biz/RoomManager';
 import { ApiMsgEnum } from './Common';
 import { MyServer } from './Core';
+import { VirtualClient } from './Core/VirtualClient';
 import { symlinkCommon } from './Utils';
 
 if (process.env.NODE_ENV === 'development') {
@@ -138,3 +139,6 @@ myServer.setApi(ApiMsgEnum.ApiRoomLeave, (connection, _data) => {
 });
 
 myServer.start();
+
+const virtualClient = new VirtualClient();
+virtualClient.startup();

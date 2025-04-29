@@ -9,33 +9,41 @@ const ACTOR_MOVE_SIZE = 17;
 const WEAPON_SHOOT_SIZE = 21;
 const TIME_PAST_SIZE = 5;
 
+function setFloat(dv: DataView, index: number, value: number) {
+    dv.setInt32(index, value * 1000);
+}
+
+function getFloat(dv: DataView, index: number) {
+    return dv.getInt32(index) / 1000;
+}
+
 function encodeActorMove(input: IActorMove, dv: DataView, index: number) {
     dv.setUint8(index++, input.type);
     dv.setUint32(index, input.id);
     index += 4;
-    dv.setFloat32(index, input.direction.x);
+    setFloat(dv, index, input.direction.x);
     index += 4;
-    dv.setFloat32(index, input.direction.y);
+    setFloat(dv, index, input.direction.y);
     index += 4;
-    dv.setFloat32(index, input.dt);
+    setFloat(dv, index, input.dt);
 }
 
 function encodeWeaponShoot(input: IWeaponShoot, dv: DataView, index: number) {
     dv.setUint8(index++, input.type);
     dv.setUint32(index, input.owner);
     index += 4;
-    dv.setFloat32(index, input.position.x);
+    setFloat(dv, index, input.position.x);
     index += 4;
-    dv.setFloat32(index, input.position.y);
+    setFloat(dv, index, input.position.y);
     index += 4;
-    dv.setFloat32(index, input.direction.x);
+    setFloat(dv, index, input.direction.x);
     index += 4;
-    dv.setFloat32(index, input.direction.y);
+    setFloat(dv, index, input.direction.y);
 }
 
 function encodeTimePast(input: ITimePast, dv: DataView, index: number) {
     dv.setUint8(index++, input.type);
-    dv.setFloat32(index, input.dt);
+    setFloat(dv, index, input.dt);
 }
 
 export function binaryEncode<T extends keyof IModel['msg']>(name: T, data: IModel['msg'][T]): ArrayBuffer {
@@ -135,10 +143,10 @@ function decodeActorMove(dv: DataView, index: number): IActorMove {
         type: InputTypeEnum.ActorMove,
         id: dv.getUint32(index),
         direction: {
-            x: dv.getFloat32((index += 4)),
-            y: dv.getFloat32((index += 4)),
+            x: getFloat(dv, (index += 4)),
+            y: getFloat(dv, (index += 4)),
         },
-        dt: dv.getFloat32((index += 4)),
+        dt: getFloat(dv, (index += 4)),
     };
     return input;
 }
@@ -148,12 +156,12 @@ function decodeWeaponShoot(dv: DataView, index: number): IWeaponShoot {
         type: InputTypeEnum.WeaponShoot,
         owner: dv.getUint32(index),
         position: {
-            x: dv.getFloat32((index += 4)),
-            y: dv.getFloat32((index += 4)),
+            x: getFloat(dv, (index += 4)),
+            y: getFloat(dv, (index += 4)),
         },
         direction: {
-            x: dv.getFloat32((index += 4)),
-            y: dv.getFloat32((index += 4)),
+            x: getFloat(dv, (index += 4)),
+            y: getFloat(dv, (index += 4)),
         },
     };
     return input;
@@ -162,7 +170,7 @@ function decodeWeaponShoot(dv: DataView, index: number): IWeaponShoot {
 function decodeTimePast(dv: DataView, index: number): ITimePast {
     const input: ITimePast = {
         type: InputTypeEnum.TimePast,
-        dt: dv.getFloat32(index),
+        dt: getFloat(dv, index),
     };
     return input;
 }

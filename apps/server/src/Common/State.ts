@@ -98,6 +98,9 @@ export class State {
             return;
         }
         const actor = this.actors.get(input.id);
+        if (actor.hp <= 0) {
+            return;
+        }
 
         const {
             direction: { x, y },
@@ -121,6 +124,27 @@ export class State {
             yPos = STAGE_HEIGHT / 2;
         }
 
+        for (const otherActor of this.actors.values()) {
+            if (otherActor.id === actor.id || otherActor.hp <= 0) {
+                continue;
+            }
+
+            const dx = xPos - otherActor.position.x;
+            const dy = yPos - otherActor.position.y;
+            const distanceSquared = dx * dx + dy * dy;
+            const collisionRadius = 100 * 2;
+
+            if (distanceSquared < collisionRadius * collisionRadius) {
+                const distance = Math.sqrt(distanceSquared);
+                const overlap = collisionRadius - distance;
+                const adjustmentX = (dx / distance) * overlap;
+                const adjustmentY = (dy / distance) * overlap;
+
+                xPos += adjustmentX;
+                yPos += adjustmentY;
+            }
+        }
+
         actor.position.x = toFixed(xPos);
         actor.position.y = toFixed(yPos);
     }
@@ -130,6 +154,9 @@ export class State {
             return;
         }
         const actor = this.actors.get(input.owner);
+        if (actor.hp <= 0) {
+            return;
+        }
 
         const { position, direction } = input;
         const bullet: IBullet = {
@@ -148,7 +175,7 @@ export class State {
 
         for (const actor of this.actors.values()) {
             if (actor.rebirthTime > 0) {
-                actor.rebirthTime -= dt;
+                actor.rebirthTime = toFixed(actor.rebirthTime - dt);
             } else if (actor.hp <= 0) {
                 actor.hp = 100;
                 actor.rebirthTime = 0;
@@ -157,8 +184,8 @@ export class State {
                 const position = direction.clone().scale((this._randomBySeed() + 1) * 480);
                 actor.position.x = toFixed(position.x);
                 actor.position.y = toFixed(position.y);
-                actor.direction.x = -direction.x;
-                actor.direction.y = -direction.y;
+                actor.direction.x = toFixed(-direction.x);
+                actor.direction.y = toFixed(-direction.y);
             }
         }
 

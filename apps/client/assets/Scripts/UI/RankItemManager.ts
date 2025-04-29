@@ -23,6 +23,9 @@ export class RankItemManager extends Component {
             text += ' (我)';
         }
         text += ` ${damage}`;
+        if (actor.hp <= 0) {
+            text += ` (阵亡 ${Math.ceil(actor.rebirthTime)} s)`;
+        }
         const label = this.node.getComponent(Label);
         label.string = text;
 

@@ -145,6 +145,8 @@ export class BattleManager extends Component {
     }
 
     private _tick(dt: number) {
+        // DataManager.Instance.autoPlay(dt);
+
         this._tickActors(dt);
     }
 

@@ -138,8 +138,3 @@ myServer.setApi(ApiMsgEnum.ApiRoomLeave, (connection, _data) => {
 });
 
 myServer.start();
-
-const bot = PlayerManager.Instance.createBot('Bot');
-const room = RoomManager.Instance.createRoom(bot);
-room.start();
-RoomManager.Instance.joinRoom(bot, room);

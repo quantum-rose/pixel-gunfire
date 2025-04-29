@@ -8,17 +8,14 @@ export class Player {
 
     public nickname: string;
 
-    public connection?: Connection;
+    public connection: Connection;
 
     public roomId: number = null;
 
-    public isBot: boolean = false;
-
-    constructor(nickname: string, connection?: Connection) {
+    constructor(nickname: string, connection: Connection) {
         this.id = Player._nextId++;
         this.nickname = nickname;
         this.connection = connection;
-        this.isBot = !connection;
     }
 
     public dump(): IPlayer {

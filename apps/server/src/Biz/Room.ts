@@ -1,7 +1,7 @@
 import { ApiMsgEnum, EntityTypeEnum, IActor, IClientInput, IMsgClientSync, InputTypeEnum, IPlayer, IRoom, State, toFixed } from '../Common';
 import { Vector2 } from '../Common/Vector2';
 import type { Connection } from '../Core';
-import { Player } from './Player';
+import type { Player } from './Player';
 
 export class Room {
     private static _nextId: number = 1;
@@ -15,8 +15,6 @@ export class Room {
     public players = new Set<Player>();
 
     private _connectionIdToFrameId = new Map<number, number>();
-
-    private _botIdToShootInterval = new Map<number, number>();
 
     public maxPlayers: number = 4;
 
@@ -66,13 +64,6 @@ export class Room {
         player.connection.listen(ApiMsgEnum.MsgClientSync, this._getClientSync, this);
     }
 
-    public addBot(bot: Player) {
-        this.players.add(bot);
-        bot.roomId = this.id;
-        this._botIdToShootInterval.set(bot.id, 0);
-        this._addActor(bot);
-    }
-
     private _addActor(player: Player) {
         let type: EntityTypeEnum;
         let weaponType: EntityTypeEnum;
@@ -95,8 +86,8 @@ export class Room {
             weaponType,
             bulletType,
             id: player.id,
-            position: { x: position.x, y: position.y },
-            direction: { x: -direction.x, y: -direction.y },
+            position: { x: toFixed(position.x), y: toFixed(position.y) },
+            direction: { x: toFixed(-direction.x), y: toFixed(-direction.y) },
             hp: 100,
             nickname: player.nickname,
             damage: 0,
@@ -116,13 +107,6 @@ export class Room {
         if (this.owner === player && !this.isEmpty) {
             this.owner = [...this.players][0];
         }
-    }
-
-    public removeBot(bot: Player) {
-        this.players.delete(bot);
-        bot.roomId = null;
-        this._removeActor(bot);
-        this._botIdToShootInterval.delete(bot.id);
     }
 
     private _removeActor(player: Player) {
@@ -159,7 +143,6 @@ export class Room {
             type: InputTypeEnum.TimePast,
             dt: toFixed(dt),
         });
-        this._tickBots(dt);
         this._lastTime = now;
     }
 
@@ -178,9 +161,6 @@ export class Room {
         });
 
         this.players.forEach(player => {
-            if (player.isBot) {
-                return;
-            }
             player.connection.send(ApiMsgEnum.MsgServerSync, {
                 lastFrameId: this._connectionIdToFrameId.get(player.connection.id),
                 inputs: this._pendingInput,
@@ -188,44 +168,5 @@ export class Room {
         });
 
         this._pendingInput.length = 0;
-    }
-
-    private _tickBots(dt: number) {
-        this.players.forEach(player => {
-            if (player.isBot) {
-                const botActor = this.state.actors.get(player.id);
-                this._tickBot(botActor, dt);
-            }
-        });
-    }
-
-    private _tickBot(botActor: IActor, dt: number) {
-        let shootInterval = this._botIdToShootInterval.get(botActor.id);
-        shootInterval -= dt;
-        this._botIdToShootInterval.set(botActor.id, shootInterval);
-
-        if (botActor.hp <= 0) {
-            return;
-        }
-
-        const direction = new Vector2(botActor.position.x, botActor.position.y).rotate(((Math.sin(process.uptime()) * Math.E + 1) * Math.PI) / 2).normalize();
-        this._pendingInput.push({
-            type: InputTypeEnum.ActorMove,
-            id: this.id,
-            direction: { x: toFixed(direction.x), y: toFixed(direction.y) },
-            dt: toFixed(dt),
-        });
-
-        if (shootInterval <= 0) {
-            const position = new Vector2(botActor.position.x, botActor.position.y + 40).add(direction.clone().scale(100));
-            this._pendingInput.push({
-                type: InputTypeEnum.WeaponShoot,
-                owner: botActor.id,
-                position: { x: toFixed(position.x), y: toFixed(position.y) },
-                direction: { x: toFixed(direction.x), y: toFixed(direction.y) },
-            });
-
-            this._botIdToShootInterval.set(botActor.id, 0.2);
-        }
     }
 }

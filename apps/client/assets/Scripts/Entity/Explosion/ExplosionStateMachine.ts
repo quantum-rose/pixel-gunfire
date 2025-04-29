@@ -3,7 +3,7 @@ import State from '../../Base/State';
 import StateMachine, { getInitParamsTrigger } from '../../Base/StateMachine';
 import { EntityTypeEnum } from '../../Common';
 import { EntityStateEnum, ParamsNameEnum } from '../../Enum';
-import { ObjectPoolManager } from '../../Global/ObjectPoolManager';
+import { ObjectPoolManager } from '../../Global';
 const { ccclass } = _decorator;
 
 @ccclass('ExplosionStateMachine')

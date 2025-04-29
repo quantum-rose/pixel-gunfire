@@ -2,12 +2,8 @@ import { _decorator, Component, director, instantiate, Label, Node, Prefab, Spri
 import { ApiMsgEnum, IClientInput, IMsgClientSync, IMsgRoom, IMsgServerSync, InputTypeEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
-import { EventEnum, PrefabPathEnum, SceneEnum, TexturePathEnum } from '../Enum';
-import DataManager from '../Global/DataManager';
-import EventManager from '../Global/EventManager';
-import { NetworkManager } from '../Global/NetworkManager';
-import { ObjectPoolManager } from '../Global/ObjectPoolManager';
-import { ResourceManager } from '../Global/ResourceManager';
+import { EventEnum, SceneEnum, TexturePathEnum } from '../Enum';
+import { DataManager, EventManager, NetworkManager, ObjectPoolManager, PrefabManager, ResourceLoader, ResourceManager } from '../Global';
 import { JoyStickManager } from '../UI/JoyStickManager';
 import { RankItemManager } from '../UI/RankItemManager';
 const { ccclass, property } = _decorator;
@@ -74,19 +70,26 @@ export class BattleManager extends Component {
     private async _loadResources() {
         const list: Promise<void>[] = [];
 
-        for (const type in PrefabPathEnum) {
-            const p = ResourceManager.Instance.loadRes(PrefabPathEnum[type], Prefab).then(prefab => {
-                DataManager.Instance.prefabMap.set(type, prefab);
-            });
-            list.push(p);
-        }
-
         for (const type in TexturePathEnum) {
             const p = ResourceManager.Instance.loadDir(TexturePathEnum[type], SpriteFrame).then(spriteFrames => {
                 DataManager.Instance.textureMap.set(type, spriteFrames);
             });
             list.push(p);
         }
+
+        list.push(
+            new Promise<void>(resolve => {
+                ResourceLoader.init(
+                    (progress: number) => {
+                        // console.log(`资源加载进度: ${progress * 100}%`);
+                    },
+                    () => {
+                        console.log('资源加载完成');
+                        resolve();
+                    }
+                );
+            })
+        );
 
         await Promise.all(list);
     }
@@ -168,7 +171,7 @@ export class BattleManager extends Component {
         for (const actor of DataManager.Instance.state.actors.values()) {
             let am = DataManager.Instance.actorMap.get(actor.id);
             if (!am) {
-                const prefab = DataManager.Instance.prefabMap.get(actor.type);
+                const prefab = PrefabManager.getPrefab(actor.type);
                 const node = instantiate(prefab);
                 node.setParent(this.actorLayer);
                 am = node.getComponent(ActorManager);

@@ -1,4 +1,4 @@
-import { Node, Prefab, SpriteFrame, Vec2 } from 'cc';
+import { Node, SpriteFrame, Vec2 } from 'cc';
 import Singleton from '../Base/Singleton';
 import { IClientInput, IMsgRoom, IPlayer, IRoom, IVec2, State, StateEventEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
@@ -6,9 +6,9 @@ import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum } from '../Enum';
 import { JoyStickManager } from '../UI/JoyStickManager';
 import { RankItemManager } from '../UI/RankItemManager';
-import EventManager from './EventManager';
+import { EventManager } from './EventManager';
 
-export default class DataManager extends Singleton {
+export class DataManager extends Singleton {
     static get Instance() {
         return super.GetInstance<DataManager>();
     }
@@ -16,8 +16,6 @@ export default class DataManager extends Singleton {
     public jm: JoyStickManager;
 
     public stage: Node;
-
-    public prefabMap = new Map<string, Prefab>();
 
     public textureMap = new Map<string, SpriteFrame[]>();
 

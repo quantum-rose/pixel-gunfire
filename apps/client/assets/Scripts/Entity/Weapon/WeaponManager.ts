@@ -2,8 +2,7 @@ import { _decorator, Node, UITransform } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
 import { IActor, InputTypeEnum, toFixed } from '../../Common';
 import { EntityStateEnum, EventEnum } from '../../Enum';
-import DataManager from '../../Global/DataManager';
-import EventManager from '../../Global/EventManager';
+import { DataManager, EventManager } from '../../Global';
 import { WeaponStateMachine } from './WeaponStateMachine';
 const { ccclass, property } = _decorator;
 

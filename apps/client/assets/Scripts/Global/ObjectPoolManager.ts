@@ -1,7 +1,8 @@
 import { Node, instantiate } from 'cc';
 import Singleton from '../Base/Singleton';
 import { EntityTypeEnum } from '../Common';
-import DataManager from './DataManager';
+import { DataManager } from './DataManager';
+import { PrefabManager } from './PrefabManager';
 
 export class ObjectPoolManager extends Singleton {
     static get Instance() {
@@ -25,7 +26,7 @@ export class ObjectPoolManager extends Singleton {
 
         const pool = this._pool.get(type);
         if (pool.length === 0) {
-            const prefab = DataManager.Instance.prefabMap.get(type);
+            const prefab = PrefabManager.getPrefab(type);
             const node = instantiate(prefab);
             node.name = type;
             node.setParent(this._objectPool.getChildByName(type + 'Pool'));

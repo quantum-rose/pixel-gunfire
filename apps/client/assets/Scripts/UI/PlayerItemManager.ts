@@ -1,6 +1,6 @@
 import { _decorator, Component, Label } from 'cc';
 import { IPlayer } from '../Common';
-import DataManager from '../Global/DataManager';
+import { DataManager } from '../Global';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerItemManager')

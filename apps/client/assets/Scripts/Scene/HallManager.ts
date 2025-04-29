@@ -1,8 +1,7 @@
 import { _decorator, Component, director, instantiate, Label, Node, Prefab } from 'cc';
 import { ApiMsgEnum, IMsgPlayerList, IMsgRoomList, IPlayer, IRoom } from '../Common';
 import { SceneEnum } from '../Enum';
-import DataManager from '../Global/DataManager';
-import { NetworkManager } from '../Global/NetworkManager';
+import { DataManager, NetworkManager } from '../Global';
 import { PlayerItemManager } from '../UI/PlayerItemManager';
 import { RoomItemManager } from '../UI/RoomItemManager';
 const { ccclass, property } = _decorator;

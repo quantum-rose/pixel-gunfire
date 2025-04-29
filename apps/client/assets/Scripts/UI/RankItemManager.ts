@@ -1,6 +1,6 @@
 import { _decorator, Color, Component, Label, Vec3 } from 'cc';
 import { IActor } from '../Common';
-import DataManager from '../Global/DataManager';
+import { DataManager } from '../Global';
 const { ccclass, property } = _decorator;
 
 @ccclass('RankItemManager')

@@ -1,6 +1,5 @@
 import { animation, AnimationClip, Sprite, SpriteFrame } from "cc";
-import DataManager from "../Global/DataManager";
-import { ResourceManager } from "../Global/ResourceManager";
+import { DataManager } from "../Global";
 import { sortSpriteFrame } from "../Utils";
 import StateMachine from "./StateMachine";
 

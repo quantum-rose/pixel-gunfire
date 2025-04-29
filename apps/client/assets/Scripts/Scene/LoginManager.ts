@@ -1,8 +1,7 @@
 import { _decorator, Component, director, EditBox, Label, sys } from 'cc';
 import { ApiMsgEnum } from '../Common';
 import { SceneEnum } from '../Enum';
-import DataManager from '../Global/DataManager';
-import { NetworkManager } from '../Global/NetworkManager';
+import { DataManager, NetworkManager } from '../Global';
 const { ccclass, property } = _decorator;
 
 const LOCAL_STORAGE_KEY = 'nickname';

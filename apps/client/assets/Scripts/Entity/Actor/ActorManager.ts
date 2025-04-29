@@ -2,8 +2,7 @@ import { _decorator, Animation, Color, instantiate, Label, Node, Prefab, Progres
 import { EntityManager } from '../../Base/EntityManager';
 import { IActor, InputTypeEnum, IVec2, toFixed } from '../../Common';
 import { EntityStateEnum, EventEnum } from '../../Enum';
-import DataManager from '../../Global/DataManager';
-import EventManager from '../../Global/EventManager';
+import { DataManager, EventManager, PrefabManager } from '../../Global';
 import { radianToAngle } from '../../Utils';
 import { WeaponManager } from '../Weapon/WeaponManager';
 import { ActorStateMachine } from './ActorStateMachine';
@@ -56,7 +55,7 @@ export class ActorManager extends EntityManager {
         this._nickname = this._info.getChildByName('Nickname');
         this._nickname.getComponent(Label).string = data.nickname;
 
-        const weaponPrefab = DataManager.Instance.prefabMap.get(data.weaponType);
+        const weaponPrefab = PrefabManager.getPrefab(data.weaponType);
         const weaponNode = instantiate(weaponPrefab);
         weaponNode.setParent(this.node);
         weaponNode.setPosition(0, 38);

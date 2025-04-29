@@ -1,6 +1,6 @@
 import { _decorator, Color, Component, EventTouch, Input, input, Node, Sprite, sys, UITransform, Vec2 } from 'cc';
 import { EventEnum } from '../Enum';
-import EventManager from '../Global/EventManager';
+import { EventManager } from '../Global';
 const { ccclass, property } = _decorator;
 
 @ccclass('ShootManager')

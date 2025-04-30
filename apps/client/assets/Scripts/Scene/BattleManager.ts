@@ -187,6 +187,13 @@ export class BattleManager extends Component {
             }
             bm.render(bullet);
         }
+
+        for (const bm of DataManager.Instance.bulletMap.values()) {
+            if (!DataManager.Instance.state.bullets.has(bm.id)) {
+                bm.node.destroy();
+                DataManager.Instance.bulletMap.delete(bm.id);
+            }
+        }
     }
 
     private _renderStage() {
@@ -198,11 +205,11 @@ export class BattleManager extends Component {
         if (myActor.hp <= 0) {
             this.countDown.active = true;
             this.countDown.getComponentInChildren(Label).string = `${Math.ceil(myActor.rebirthTime)}`;
-            this.stage.setScale(Vec3.lerp(new Vec3(), this.stage.getScale(), new Vec3(0.333333, 0.333333, 1), 0.1));
-            this.stage.setPosition(Vec3.lerp(new Vec3(), this.stage.getPosition(), new Vec3(0, 0), 0.07));
+            this.stage.setScale(Vec3.lerp(new Vec3(), this.stage.getScale(), new Vec3(0.333333, 0.333333, 1), 0.14));
+            this.stage.setPosition(Vec3.lerp(new Vec3(), this.stage.getPosition(), new Vec3(0, 0), 0.14));
         } else {
             this.countDown.active = false;
-            this.stage.setScale(Vec3.lerp(new Vec3(), this.stage.getScale(), new Vec3(1, 1, 1), 0.1));
+            this.stage.setScale(Vec3.lerp(new Vec3(), this.stage.getScale(), new Vec3(1, 1, 1), 0.07));
 
             const targetPosition = new Vec3(-myActor.position.x, -myActor.position.y);
 

@@ -1,5 +1,6 @@
 import { animation, AnimationClip, Sprite, SpriteFrame } from "cc";
-import { DataManager } from "../Global";
+import { TexturePathEnum } from "../Enum";
+import { TextureManager } from "../Global";
 import { sortSpriteFrame } from "../Utils";
 import StateMachine from "./StateMachine";
 
@@ -15,20 +16,20 @@ export default class State {
   private animationClip: AnimationClip;
   constructor(
     private fsm: StateMachine,
-    private path: string,
+    private name: string,
     private wrapMode: AnimationClip.WrapMode = AnimationClip.WrapMode.Normal,
     private force: boolean = false
   ) {
     //生成动画轨道属性
     const track = new animation.ObjectTrack();
     track.path = new animation.TrackPath().toComponent(Sprite).toProperty("spriteFrame");
-    const spriteFrames = DataManager.Instance.textureMap.get(this.path);
+    const spriteFrames = TextureManager.getTexture(TexturePathEnum[this.name]);
     const frames: Array<[number, SpriteFrame]> = sortSpriteFrame(spriteFrames).map((item, index) => [index * ANIMATION_SPEED, item]);
     track.channel.curve.assignSorted(frames);
 
     //动画添加轨道
     this.animationClip = new AnimationClip();
-    this.animationClip.name = this.path;
+    this.animationClip.name = this.name;
     this.animationClip.duration = frames.length * ANIMATION_SPEED;
     this.animationClip.addTrack(track);
     this.animationClip.wrapMode = this.wrapMode;

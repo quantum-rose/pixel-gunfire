@@ -1,9 +1,9 @@
-import { _decorator, Component, director, instantiate, Label, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
+import { _decorator, Component, director, instantiate, Label, Node, Prefab, Vec3 } from 'cc';
 import { ApiMsgEnum, IClientInput, IMsgClientSync, IMsgRoom, IMsgServerSync, InputTypeEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
-import { EventEnum, SceneEnum, TexturePathEnum } from '../Enum';
-import { DataManager, EventManager, NetworkManager, ObjectPoolManager, PrefabManager, ResourceLoader, ResourceManager } from '../Global';
+import { EventEnum, SceneEnum } from '../Enum';
+import { DataManager, EventManager, NetworkManager, ObjectPoolManager, PrefabManager, ResourceLoader } from '../Global';
 import { JoyStickManager } from '../UI/JoyStickManager';
 import { RankItemManager } from '../UI/RankItemManager';
 const { ccclass, property } = _decorator;
@@ -68,30 +68,17 @@ export class BattleManager extends Component {
     }
 
     private async _loadResources() {
-        const list: Promise<void>[] = [];
-
-        for (const type in TexturePathEnum) {
-            const p = ResourceManager.Instance.loadDir(TexturePathEnum[type], SpriteFrame).then(spriteFrames => {
-                DataManager.Instance.textureMap.set(type, spriteFrames);
-            });
-            list.push(p);
-        }
-
-        list.push(
-            new Promise<void>(resolve => {
-                ResourceLoader.init(
-                    (progress: number) => {
-                        // console.log(`资源加载进度: ${progress * 100}%`);
-                    },
-                    () => {
-                        console.log('资源加载完成');
-                        resolve();
-                    }
-                );
-            })
-        );
-
-        await Promise.all(list);
+        return new Promise<void>(resolve => {
+            ResourceLoader.init(
+                (progress: number) => {
+                    console.log(`资源加载进度: ${progress * 100}%`);
+                },
+                () => {
+                    console.log('资源加载完成');
+                    resolve();
+                }
+            );
+        });
     }
 
     private async _connectServer() {

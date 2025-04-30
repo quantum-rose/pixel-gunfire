@@ -1,7 +1,5 @@
-import { _decorator, AudioClip, AudioSource, director, Node, resources } from 'cc';
-const { ccclass, property } = _decorator;
+import { AudioClip, AudioSource, director, Node, resources } from 'cc';
 
-@ccclass('AudioManager')
 export class AudioManager {
     private static _audioSource: AudioSource = null;
 

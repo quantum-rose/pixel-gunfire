@@ -1,4 +1,4 @@
-import { Node, SpriteFrame, Vec2 } from 'cc';
+import { Node, Vec2 } from 'cc';
 import Singleton from '../Base/Singleton';
 import { IClientInput, IMsgRoom, IPlayer, IRoom, IVec2, State, StateEventEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
@@ -16,8 +16,6 @@ export class DataManager extends Singleton {
     public jm: JoyStickManager;
 
     public stage: Node;
-
-    public textureMap = new Map<string, SpriteFrame[]>();
 
     public actorMap = new Map<number, ActorManager>();
 

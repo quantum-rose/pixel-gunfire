@@ -1,5 +1,6 @@
 import { AudioManager } from './AudioManager';
 import { PrefabManager } from './PrefabManager';
+import { TextureManager } from './TextureManager';
 
 interface IOnProgress {
     (progress: number): void;
@@ -26,6 +27,12 @@ export class ResourceLoader {
     public static loadedCount = 0;
 
     public static init(onProgress: IOnProgress, onComplete: IOnComplete) {
+        if (ResourceLoader.loadedCount === ResourceLoader.resToLoader.size) {
+            onProgress(1);
+            onComplete();
+            return;
+        }
+
         const onProgressWrap = (type: string) => (progress: number) => {
             ResourceLoader.progressMap.set(type, progress);
             let totalProgress = 0;
@@ -56,4 +63,5 @@ export class ResourceLoader {
 }
 
 ResourceLoader.registerResLoader('prefab', PrefabManager.loadPrefabs);
+ResourceLoader.registerResLoader('texture', TextureManager.loadTextures);
 ResourceLoader.registerResLoader('sound', AudioManager.loadSounds);

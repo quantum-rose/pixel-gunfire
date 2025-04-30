@@ -5,4 +5,4 @@ export * from './NetworkManager';
 export * from './ObjectPoolManager';
 export * from './PrefabManager';
 export * from './ResourceLoader';
-export * from './ResourceManager';
+export * from './TextureManager';

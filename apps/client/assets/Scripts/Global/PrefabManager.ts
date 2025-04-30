@@ -1,7 +1,7 @@
 import { Prefab, resources } from 'cc';
 
 export class PrefabManager {
-    private static _objs = new Map<string, Prefab>();
+    private static _resources = new Map<string, Prefab>();
 
     public static loadPrefabs(onProgress: (progress: number) => void): Promise<void> {
         return new Promise<void>((resolve, reject) => {
@@ -14,7 +14,7 @@ export class PrefabManager {
                 (err, assets) => {
                     if (assets) {
                         for (let prefab of assets) {
-                            PrefabManager._objs.set(prefab.name, prefab);
+                            PrefabManager._resources.set(prefab.name, prefab);
                         }
                         resolve();
                     } else {
@@ -26,10 +26,10 @@ export class PrefabManager {
     }
 
     public static getPrefab(name: string) {
-        if (!PrefabManager._objs.has(name)) {
+        if (!PrefabManager._resources.has(name)) {
             console.log(`预制体 ${name} 不存在`);
             return null;
         }
-        return PrefabManager._objs.get(name);
+        return PrefabManager._resources.get(name);
     }
 }

@@ -222,22 +222,18 @@ export class VirtualClient {
 
         let direction: Vector2 = null;
 
-        if (myActor.hp < 50) {
-            const otherAliveActors = Array.from(this._state.actors.values()).filter(actor => actor.id !== myActor.id && actor.hp > 0);
-            if (otherAliveActors.length === 0) {
-                return;
-            }
+        if (this._state.actors.size < 2) {
+            return;
+        }
 
+        const otherAliveActors = Array.from(this._state.actors.values()).filter(actor => actor.id !== myActor.id && actor.hp > 0);
+
+        if (otherAliveActors.length === 0 || myActor.hp > 50) {
+            direction = new Vector2(myActor.position.x, myActor.position.y).rotate(((Math.sin(process.uptime() * 0.5) * Math.E + 1) * Math.PI) / 2).normalize();
+        } else {
             otherAliveActors.sort((a, b) => a.hp - b.hp);
             const targetActor = otherAliveActors[0];
             direction = new Vector2(targetActor.position.x - myActor.position.x, targetActor.position.y - myActor.position.y).normalize();
-        } else {
-            const otherActors = Array.from(this._state.actors.values()).filter(actor => actor.id !== myActor.id);
-            if (otherActors.length === 0) {
-                return;
-            }
-
-            direction = new Vector2(myActor.position.x, myActor.position.y).rotate(((Math.sin(process.uptime() * 0.5) * Math.E + 1) * Math.PI) / 2).normalize();
         }
 
         this._shootInterval -= dt;

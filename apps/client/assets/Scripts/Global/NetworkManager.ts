@@ -1,5 +1,5 @@
+import { ApiMsgEnum, binaryDecode, binaryEncode, IModel } from '@pixel-gunfire/common';
 import Singleton from '../Base/Singleton';
-import { ApiMsgEnum, binaryDecode, binaryEncode, IModel } from '../Common';
 
 interface IItem {
     cb: Function;

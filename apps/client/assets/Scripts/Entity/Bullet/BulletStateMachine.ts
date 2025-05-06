@@ -1,7 +1,7 @@
+import { EntityTypeEnum } from '@pixel-gunfire/common';
 import { _decorator, Animation, AnimationClip } from 'cc';
 import State from '../../Base/State';
 import StateMachine, { getInitParamsTrigger } from '../../Base/StateMachine';
-import { EntityTypeEnum } from '../../Common';
 import { EntityStateEnum, ParamsNameEnum } from '../../Enum';
 const { ccclass } = _decorator;
 

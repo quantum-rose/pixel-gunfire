@@ -1,4 +1,4 @@
-import { IPlayer } from '../Common';
+import { IPlayer } from '@pixel-gunfire/common';
 import { Connection } from '../Core';
 
 export class Player {

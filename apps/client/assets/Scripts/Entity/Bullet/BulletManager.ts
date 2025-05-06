@@ -1,6 +1,6 @@
+import { EntityTypeEnum, IBullet, IVec2 } from '@pixel-gunfire/common';
 import { _decorator, Node, tween, Tween, Vec3 } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
-import { EntityTypeEnum, IBullet, IVec2 } from '../../Common';
 import { EntityStateEnum, EventEnum } from '../../Enum';
 import { DataManager, EventManager, ObjectPoolManager } from '../../Global';
 import { radianToAngle } from '../../Utils';

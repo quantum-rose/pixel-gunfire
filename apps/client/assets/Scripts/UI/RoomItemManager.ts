@@ -1,5 +1,5 @@
+import { ApiMsgEnum, IRoom } from '@pixel-gunfire/common';
 import { _decorator, Button, Color, Component, director, Label } from 'cc';
-import { ApiMsgEnum, IRoom } from '../Common';
 import { SceneEnum } from '../Enum';
 import { DataManager, NetworkManager } from '../Global';
 const { ccclass, property } = _decorator;

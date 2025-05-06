@@ -1,5 +1,5 @@
+import { ApiMsgEnum, IMsgPlayerList, IMsgRoomList, IPlayer, IRoom } from '@pixel-gunfire/common';
 import { _decorator, Component, director, instantiate, Label, Node, Prefab } from 'cc';
-import { ApiMsgEnum, IMsgPlayerList, IMsgRoomList, IPlayer, IRoom } from '../Common';
 import { SceneEnum } from '../Enum';
 import { DataManager, NetworkManager } from '../Global';
 import { PlayerItemManager } from '../UI/PlayerItemManager';

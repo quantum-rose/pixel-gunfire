@@ -1,5 +1,5 @@
+import { ApiMsgEnum, IRoom } from '@pixel-gunfire/common';
 import Singleton from '../Base/Singleton';
-import { ApiMsgEnum, IRoom } from '../Common';
 import type { Player } from './Player';
 import { PlayerManager } from './PlayerManager';
 import { Room } from './Room';

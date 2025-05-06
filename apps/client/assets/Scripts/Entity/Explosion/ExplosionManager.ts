@@ -1,6 +1,6 @@
+import { EntityTypeEnum, IVec2 } from '@pixel-gunfire/common';
 import { _decorator } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
-import { EntityTypeEnum, IVec2 } from '../../Common';
 import { EntityStateEnum } from '../../Enum';
 import { ExplosionStateMachine } from './ExplosionStateMachine';
 const { ccclass, property } = _decorator;

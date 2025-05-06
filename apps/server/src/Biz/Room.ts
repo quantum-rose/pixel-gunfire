@@ -1,5 +1,16 @@
-import { ApiMsgEnum, EntityTypeEnum, IActor, IClientInput, IMsgClientSync, InputTypeEnum, IPlayer, IRoom, State, toFixed } from '../Common';
-import { Vector2 } from '../Common/Vector2';
+import {
+    ApiMsgEnum,
+    EntityTypeEnum,
+    IActor,
+    IClientInput,
+    IMsgClientSync,
+    InputTypeEnum,
+    IPlayer,
+    IRoom,
+    State,
+    toFixed,
+    Vector2,
+} from '@pixel-gunfire/common';
 import type { Connection } from '../Core';
 import type { Player } from './Player';
 
@@ -32,9 +43,9 @@ export class Room {
 
     private _lastTime: number = null;
 
-    private _timePastTimer: NodeJS.Timer | null = null;
+    private _timePastTimer: NodeJS.Timeout | null = null;
 
-    private _syncTimer: NodeJS.Timer | null = null;
+    private _syncTimer: NodeJS.Timeout | null = null;
 
     constructor(owner: Player) {
         this.id = Room._nextId++;

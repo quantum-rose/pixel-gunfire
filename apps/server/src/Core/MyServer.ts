@@ -1,5 +1,5 @@
+import { ApiMsgEnum, IModel } from '@pixel-gunfire/common';
 import { WebSocketServer } from 'ws';
-import { ApiMsgEnum, IModel } from '../Common';
 import { Connection } from './Connection';
 
 export class MyServer {

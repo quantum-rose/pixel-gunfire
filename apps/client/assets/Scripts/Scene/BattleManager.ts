@@ -1,5 +1,5 @@
+import { ApiMsgEnum, IClientInput, IMsgClientSync, IMsgRoom, IMsgServerSync, InputTypeEnum } from '@pixel-gunfire/common';
 import { _decorator, Component, director, instantiate, Label, Node, Prefab, Vec3 } from 'cc';
-import { ApiMsgEnum, IClientInput, IMsgClientSync, IMsgRoom, IMsgServerSync, InputTypeEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum, SceneEnum } from '../Enum';

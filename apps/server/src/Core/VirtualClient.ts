@@ -1,4 +1,3 @@
-import { WebSocket } from 'ws';
 import {
     ApiMsgEnum,
     binaryDecode,
@@ -13,8 +12,9 @@ import {
     IRoom,
     State,
     toFixed,
-} from '../Common';
-import { Vector2 } from '../Common/Vector2';
+    Vector2,
+} from '@pixel-gunfire/common';
+import { WebSocket } from 'ws';
 
 interface IItem {
     cb: Function;

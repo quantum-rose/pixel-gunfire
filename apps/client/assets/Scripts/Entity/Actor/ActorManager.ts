@@ -1,6 +1,6 @@
+import { IActor, InputTypeEnum, IVec2, toFixed } from '@pixel-gunfire/common';
 import { _decorator, Animation, Color, instantiate, Label, Node, Prefab, ProgressBar, Sprite, Tween, tween, Vec3 } from 'cc';
 import { EntityManager } from '../../Base/EntityManager';
-import { IActor, InputTypeEnum, IVec2, toFixed } from '../../Common';
 import { EntityStateEnum, EventEnum } from '../../Enum';
 import { DataManager, EventManager, PrefabManager } from '../../Global';
 import { radianToAngle } from '../../Utils';

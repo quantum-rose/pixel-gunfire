@@ -1,5 +1,5 @@
+import { ApiMsgEnum, IPlayer } from '@pixel-gunfire/common';
 import Singleton from '../Base/Singleton';
-import { ApiMsgEnum, IPlayer } from '../Common';
 import type { Connection } from '../Core';
 import { Player } from './Player';
 

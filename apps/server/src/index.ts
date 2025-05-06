@@ -1,13 +1,8 @@
+import { ApiMsgEnum } from '@pixel-gunfire/common';
 import { PlayerManager } from './Biz/PlayerManager';
 import { RoomManager } from './Biz/RoomManager';
-import { ApiMsgEnum } from './Common';
 import { MyServer } from './Core';
 import { VirtualClient } from './Core/VirtualClient';
-import { symlinkCommon } from './Utils';
-
-if (process.env.NODE_ENV === 'development') {
-    symlinkCommon();
-}
 
 const myServer = new MyServer({
     port: 9876,

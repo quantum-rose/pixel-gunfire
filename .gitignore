@@ -153,6 +153,4 @@ Thumbs.db
 
 .idea/
 
-apps/client/assets/Scripts/Common
-
 .yarn/install-state.gz

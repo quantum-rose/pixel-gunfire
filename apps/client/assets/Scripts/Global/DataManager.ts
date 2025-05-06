@@ -1,6 +1,6 @@
+import { IClientInput, IMsgRoom, IPlayer, IRoom, IVec2, State, StateEventEnum } from '@pixel-gunfire/common';
 import { Node, Vec2 } from 'cc';
 import Singleton from '../Base/Singleton';
-import { IClientInput, IMsgRoom, IPlayer, IRoom, IVec2, State, StateEventEnum } from '../Common';
 import { ActorManager } from '../Entity/Actor/ActorManager';
 import { BulletManager } from '../Entity/Bullet/BulletManager';
 import { EventEnum } from '../Enum';

@@ -1,6 +1,6 @@
+import { EntityTypeEnum } from '@pixel-gunfire/common';
 import { Node, instantiate } from 'cc';
 import Singleton from '../Base/Singleton';
-import { EntityTypeEnum } from '../Common';
 import { DataManager } from './DataManager';
 import { PrefabManager } from './PrefabManager';
 

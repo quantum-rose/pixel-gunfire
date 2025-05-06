@@ -1,7 +1,7 @@
+import { ApiMsgEnum, binaryDecode, binaryEncode, IModel } from '@pixel-gunfire/common';
 import { WebSocket } from 'ws';
 import { PlayerManager } from '../Biz/PlayerManager';
 import { RoomManager } from '../Biz/RoomManager';
-import { ApiMsgEnum, binaryDecode, binaryEncode, IModel } from '../Common';
 import { bufferToArrayBuffer } from '../Utils';
 import type { MyServer } from './MyServer';
 

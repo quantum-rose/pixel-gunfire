@@ -1,5 +1,5 @@
+import { IPlayer } from '@pixel-gunfire/common';
 import { _decorator, Component, Label } from 'cc';
-import { IPlayer } from '../Common';
 import { DataManager } from '../Global';
 const { ccclass, property } = _decorator;
 

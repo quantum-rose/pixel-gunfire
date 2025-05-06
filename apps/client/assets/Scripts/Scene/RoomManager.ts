@@ -1,5 +1,5 @@
+import { ApiMsgEnum, IMsgRoom, IPlayer } from '@pixel-gunfire/common';
 import { _decorator, Button, Component, instantiate, Label, Node, Prefab, UIOpacity } from 'cc';
-import { ApiMsgEnum, IMsgRoom, IPlayer } from '../Common';
 import { DataManager, NetworkManager } from '../Global';
 import { PlayerItemManager } from '../UI/PlayerItemManager';
 const { ccclass, property } = _decorator;

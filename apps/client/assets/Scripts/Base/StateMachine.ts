@@ -1,29 +1,29 @@
-import { _decorator, Animation, Component } from "cc";
-import { EntityTypeEnum } from "../Common";
-import { FsmParamTypeEnum } from "../Enum";
+import { EntityTypeEnum } from '@pixel-gunfire/common';
+import { _decorator, Animation, Component } from 'cc';
+import { FsmParamTypeEnum } from '../Enum';
+import State from './State';
+import SubStateMachine from './SubStateMachine';
 const { ccclass } = _decorator;
-import State from "./State";
-import SubStateMachine from "./SubStateMachine";
 
 type ParamsValueType = boolean | number;
 
 export interface IParamsValue {
-  type: FsmParamTypeEnum;
-  value: ParamsValueType;
+    type: FsmParamTypeEnum;
+    value: ParamsValueType;
 }
 
 export const getInitParamsTrigger = () => {
-  return {
-    type: FsmParamTypeEnum.Trigger,
-    value: false,
-  };
+    return {
+        type: FsmParamTypeEnum.Trigger,
+        value: false,
+    };
 };
 
 export const getInitParamsNumber = () => {
-  return {
-    type: FsmParamTypeEnum.Number,
-    value: 0,
-  };
+    return {
+        type: FsmParamTypeEnum.Number,
+        value: 0,
+    };
 };
 
 /***
@@ -39,54 +39,54 @@ export const getInitParamsNumber = () => {
 /***
  * 有限状态机基类
  */
-@ccclass("StateMachine")
+@ccclass('StateMachine')
 export default abstract class StateMachine extends Component {
-  private _currentState: State | SubStateMachine = null;
-  params: Map<string, IParamsValue> = new Map();
-  stateMachines: Map<string, SubStateMachine | State> = new Map();
-  animationComponent: Animation;
-  type: EntityTypeEnum;
+    private _currentState: State | SubStateMachine = null;
+    params: Map<string, IParamsValue> = new Map();
+    stateMachines: Map<string, SubStateMachine | State> = new Map();
+    animationComponent: Animation;
+    type: EntityTypeEnum;
 
-  getParams(paramName: string) {
-    if (this.params.has(paramName)) {
-      return this.params.get(paramName).value;
+    getParams(paramName: string) {
+        if (this.params.has(paramName)) {
+            return this.params.get(paramName).value;
+        }
     }
-  }
 
-  setParams(paramName: string, value: ParamsValueType) {
-    if (this.params.has(paramName)) {
-      this.params.get(paramName).value = value;
-      this.run();
-      this.resetTrigger();
+    setParams(paramName: string, value: ParamsValueType) {
+        if (this.params.has(paramName)) {
+            this.params.get(paramName).value = value;
+            this.run();
+            this.resetTrigger();
+        }
     }
-  }
 
-  get currentState() {
-    return this._currentState;
-  }
-
-  set currentState(newState) {
-    if (!newState) {
-      return;
+    get currentState() {
+        return this._currentState;
     }
-    this._currentState = newState;
-    this._currentState.run();
-  }
 
-  /***
-   * 清空所有trigger
-   */
-  resetTrigger() {
-    for (const [, value] of this.params) {
-      if (value.type === FsmParamTypeEnum.Trigger) {
-        value.value = false;
-      }
+    set currentState(newState) {
+        if (!newState) {
+            return;
+        }
+        this._currentState = newState;
+        this._currentState.run();
     }
-  }
 
-  /***
-   * 由子类重写，方法目标是根据当前状态和参数修改currentState
-   */
-  abstract init(...args: any[]): void;
-  abstract run(): void;
+    /***
+     * 清空所有trigger
+     */
+    resetTrigger() {
+        for (const [, value] of this.params) {
+            if (value.type === FsmParamTypeEnum.Trigger) {
+                value.value = false;
+            }
+        }
+    }
+
+    /***
+     * 由子类重写，方法目标是根据当前状态和参数修改currentState
+     */
+    abstract init(...args: any[]): void;
+    abstract run(): void;
 }

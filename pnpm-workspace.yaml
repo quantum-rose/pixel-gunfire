@@ -1,0 +1,2 @@
+packages:
+    - apps/* # 包括 client 和 server

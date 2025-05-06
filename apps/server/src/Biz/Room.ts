@@ -32,9 +32,9 @@ export class Room {
 
     private _lastTime: number = null;
 
-    private _timePastTimer: NodeJS.Timer | null = null;
+    private _timePastTimer: NodeJS.Timeout | null = null;
 
-    private _syncTimer: NodeJS.Timer | null = null;
+    private _syncTimer: NodeJS.Timeout | null = null;
 
     constructor(owner: Player) {
         this.id = Room._nextId++;

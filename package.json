@@ -1,12 +1,14 @@
 {
-  "name": "game",
-  "private": true,
+  "name": "pixel-gunfire",
   "version": "1.0.0",
-  "workspaces": [
-    "apps/*"
-  ],
+  "description": "",
+  "private": true,
   "scripts": {
-    "dev": "yarn workspace @game/server run dev",
-    "build": "yarn workspace @game/server run build"
-  }
+    "dev": "pnpm -F @pixel-gunfire/server dev",
+    "build": "pnpm -F @pixel-gunfire/server build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.4.1"
 }

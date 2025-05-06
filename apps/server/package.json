@@ -1,18 +1,19 @@
 {
-  "name": "@game/server",
+  "name": "@pixel-gunfire/server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development nodemon --exec ts-node ./src/index -e ts",
-    "build": "esbuild ./src/index.ts --bundle --platform=node --outfile=dist/index.js"
+    "dev": "cross-env NODE_ENV=development nodemon --exec ts-node ./src/index -e ts",
+    "build": "esbuild ./src/index.ts --bundle --platform=node --minify --outfile=dist/index.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^18.11.7",
     "@types/ws": "^8.5.3",
+    "cross-env": "^7.0.3",
     "esbuild": "^0.25.3",
     "eslint": "^8.26.0",
     "nodemon": "^2.0.20",
